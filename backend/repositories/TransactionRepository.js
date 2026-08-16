@@ -268,16 +268,17 @@ class TransactionRepository {
   async getMonthlyTrend(userId, months = 6) {
     const res = await db.query(
       `SELECT TO_CHAR(date, 'YYYY-MM') as month_year,
-              type,
-              SUM(amount) as total
-       FROM transactions
-       WHERE user_id = $1
-       GROUP BY month_year, type
-       ORDER BY month_year ASC`,
-      [userId]
+            type,
+            SUM(amount) as total
+     FROM transactions
+     WHERE user_id = $1
+     GROUP BY month_year, type
+     ORDER BY month_year DESC
+     LIMIT $2`,
+      [userId, months]
     );
 
-    return res.rows;
+    return res.rows.reverse();
   }
 
   async bulkInsert(userId, transactionsArray) {

@@ -42,15 +42,16 @@ function loadLocalStore() {
 }
 
 async function initDb() {
-  const connectionString = env.DB.url || 
-    `postgres://${env.DB.user}:${env.DB.password}@${env.DB.host}:${env.DB.port}/${env.DB.database}`;
-
   try {
     const pool = new Pool({
-      connectionString,
+      host: env.DB.host,
+      port: env.DB.port,
+      database: env.DB.database,
+      user: env.DB.user,
+      password: env.DB.password,
       connectionTimeoutMillis: 2000
     });
-    
+
     const client = await pool.connect();
     client.release();
     pgPool = pool;

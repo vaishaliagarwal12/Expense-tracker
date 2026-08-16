@@ -45,12 +45,14 @@ class HealthScoreService {
 
     // 5. Subscription Control Score (0 to 15 pts)
     let subscriptionScore = 15;
-    const monthlySubCost = subscriptions.reduce((sum, s) => {
-      const amt = parseFloat(s.amount);
-      if (s.billing_frequency === 'Yearly') return sum + (amt / 12);
-      if (s.billing_frequency === 'Quarterly') return sum + (amt / 3);
-      return sum + amt;
-    }, 0);
+    const monthlySubCost = subscriptions
+      .filter(s => s.status === 'Active')
+      .reduce((sum, s) => {
+        const amt = parseFloat(s.amount);
+        if (s.billing_frequency === 'Yearly') return sum + (amt / 12);
+        if (s.billing_frequency === 'Quarterly') return sum + (amt / 3);
+        return sum + amt;
+      }, 0);
 
     if (metrics.income > 0) {
       const subRatio = (monthlySubCost / metrics.income) * 100;
@@ -91,7 +93,7 @@ class HealthScoreService {
         score: budgetScore,
         maxScore: 25,
         status: budgetScore >= 20 ? 'Strong' : 'Overbudget risks',
-        explanation: budgetsData.budgets.length > 0 
+        explanation: budgetsData.budgets.length > 0
           ? `Overall budget utilization is ${budgetsData.summary.overallUsagePercentage}%.`
           : 'No category budgets created yet.'
       },

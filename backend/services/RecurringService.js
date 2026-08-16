@@ -4,13 +4,13 @@ const { AppError } = require('../utils/errorResponse');
 
 function calculateNextOccurrence(currentOccurrenceStr, frequency) {
   const [y, m, d] = currentOccurrenceStr.split('-').map(Number);
-  
+
   if (frequency === 'Weekly') {
     const dt = new Date(Date.UTC(y, m - 1, d));
     dt.setUTCDate(dt.getUTCDate() + 7);
     return dt.toISOString().split('T')[0];
   }
-  
+
   if (frequency === 'Monthly') {
     let targetYear = y;
     let targetMonth = m + 1;
@@ -67,19 +67,28 @@ class RecurringService {
   }
 
   async processDueRecurringTransactions() {
-    const today = new Date().toISOString().split('T')[0];
+    const today = new Intl.DateTimeFormat('en-CA', {
+      timeZone: 'Asia/Kolkata'
+    }).format(new Date());
     const dueItems = await recurringRepository.findDue();
     let totalGenerated = 0;
 
     for (const item of dueItems) {
       const isActive = item.is_active === true || item.is_active === 1;
-      if (!isActive || !item.next_occurrence || item.next_occurrence > today) {
+
+      if (!isActive || !item.next_occurrence) {
         continue;
       }
 
       try {
-        let currentOccurrence = item.next_occurrence;
+        let currentOccurrence =
+          item.next_occurrence instanceof Date
+            ? item.next_occurrence.toISOString().split('T')[0]
+            : String(item.next_occurrence).slice(0, 10);
 
+        if (currentOccurrence > today) {
+          continue;
+        }
         while (currentOccurrence <= today) {
           await transactionRepository.create(item.user_id, {
             amount: parseFloat(item.amount),

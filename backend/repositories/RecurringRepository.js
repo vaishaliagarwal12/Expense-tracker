@@ -23,7 +23,7 @@ class RecurringRepository {
     await db.query(
       `INSERT INTO recurring_transactions (id, user_id, name, amount, category, type, frequency, start_date, next_occurrence, is_active)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
-      [id, userId, name, amount, category, type, frequency, start_date, next_occurrence, is_active ? 1 : 0]
+      [id, userId, name, amount, category, type, frequency, start_date, next_occurrence, is_active]
     );
     return this.findById(userId, id);
   }
@@ -33,7 +33,7 @@ class RecurringRepository {
       `UPDATE recurring_transactions 
        SET name = $3, amount = $4, category = $5, type = $6, frequency = $7, start_date = $8, next_occurrence = $9, is_active = $10, updated_at = CURRENT_TIMESTAMP
        WHERE id = $1 AND user_id = $2`,
-      [id, userId, name, amount, category, type, frequency, start_date, next_occurrence, is_active ? 1 : 0]
+      [id, userId, name, amount, category, type, frequency, start_date, next_occurrence, is_active]
     );
     return this.findById(userId, id);
   }
@@ -41,13 +41,14 @@ class RecurringRepository {
   async findDue() {
     const res = await db.query(
       `SELECT * FROM recurring_transactions
-       WHERE is_active = TRUE
-       AND next_occurrence <= CURRENT_DATE
-       ORDER BY next_occurrence ASC`,
+     WHERE is_active = TRUE
+     AND next_occurrence <= (CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Kolkata')::date
+     ORDER BY next_occurrence ASC`,
       []
     );
     return res.rows;
   }
+
 
   async updateNextOccurrence(id, nextOccurrence) {
     await db.query(
