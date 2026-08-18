@@ -1,7 +1,10 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { CurrencyProvider } from './context/CurrencyContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { LanguageProvider } from './context/LanguageContext';
+import { ToastProvider } from './context/ToastContext';
 import Layout from './components/layout/Layout';
 
 import LoginPage from './pages/LoginPage';
@@ -37,32 +40,39 @@ function PublicRoute({ children }) {
 export default function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <BrowserRouter>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
-            <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
+      <LanguageProvider>
+        <ToastProvider>
+          <AuthProvider>
+            <CurrencyProvider>
+              <BrowserRouter>
+                <Routes>
+                  {/* Public Routes */}
+                  <Route path="/login" element={<PublicRoute><LoginPage /></PublicRoute>} />
+                  <Route path="/register" element={<PublicRoute><RegisterPage /></PublicRoute>} />
 
-            {/* Protected SaaS App Routes */}
-            <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-              <Route index element={<Navigate to="/dashboard" replace />} />
-              <Route path="dashboard" element={<DashboardPage />} />
-              <Route path="transactions" element={<TransactionsPage />} />
-              <Route path="budgets" element={<BudgetsPage />} />
-              <Route path="goals" element={<GoalsPage />} />
-              <Route path="analytics" element={<AnalyticsPage />} />
-              <Route path="subscriptions" element={<SubscriptionsPage />} />
-              <Route path="recurring" element={<RecurringPage />} />
-              <Route path="insights" element={<InsightsPage />} />
-              <Route path="profile" element={<ProfilePage />} />
-            </Route>
+                  {/* Protected App Routes */}
+                  <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+                    <Route index element={<Navigate to="/dashboard" replace />} />
+                    <Route path="dashboard" element={<DashboardPage />} />
+                    <Route path="transactions" element={<TransactionsPage />} />
+                    <Route path="budgets" element={<BudgetsPage />} />
+                    <Route path="goals" element={<GoalsPage />} />
+                    <Route path="analytics" element={<AnalyticsPage />} />
+                    <Route path="subscriptions" element={<SubscriptionsPage />} />
+                    <Route path="recurring" element={<RecurringPage />} />
+                    <Route path="insights" element={<InsightsPage />} />
+                    <Route path="profile" element={<ProfilePage />} />
+                  </Route>
 
-            {/* Fallback */}
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
-          </Routes>
-        </BrowserRouter>
-      </AuthProvider>
+                  {/* Fallback */}
+                  <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                </Routes>
+              </BrowserRouter>
+            </CurrencyProvider>
+          </AuthProvider>
+        </ToastProvider>
+      </LanguageProvider>
     </ThemeProvider>
   );
 }
+

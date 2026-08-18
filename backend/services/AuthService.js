@@ -4,6 +4,7 @@ const budgetRepository = require('../repositories/BudgetRepository');
 const goalRepository = require('../repositories/GoalRepository');
 const subscriptionRepository = require('../repositories/SubscriptionRepository');
 const recurringRepository = require('../repositories/RecurringRepository');
+const emailService = require('./EmailService');
 const { hashPassword, comparePassword } = require('../utils/password');
 const { generateToken } = require('../utils/jwt');
 const { AppError } = require('../utils/errorResponse');
@@ -21,6 +22,13 @@ class AuthService {
     // Seed sample financial data for new user so dashboard is immediately rich & realistic
     await this.seedSampleData(user.id);
 
+    // Send welcome email safely (failures logged, won't interrupt registration)
+    try {
+      await emailService.sendWelcomeEmail(user.email, user.name);
+    } catch (emailError) {
+      console.error('Email sending failed:', emailError.message);
+    }
+
     const token = generateToken({ id: user.id, email: user.email, name: user.name });
 
     return {
@@ -33,6 +41,7 @@ class AuthService {
       token
     };
   }
+
 
   async login({ email, password }) {
     const user = await userRepository.findByEmail(email);

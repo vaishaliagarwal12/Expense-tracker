@@ -36,3 +36,5 @@ export function getPastMonthsOptions(count = 12) {
   }
   return options;
 }
+
+export const getMonthYearOptions = getPastMonthsOptions;

@@ -1,91 +1,110 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
+import { Drawer } from '../ui/Modal';
 import { 
   LayoutDashboard, 
   Receipt, 
   PieChart, 
   Target, 
-  BarChart3, 
-  Repeat, 
   CreditCard, 
+  Repeat, 
+  BarChart3, 
   Sparkles, 
-  User,
-  X,
-  Wallet
+  Settings, 
+  LogOut,
+  MoreHorizontal
 } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
 
 export default function MobileNav({ isOpen, onClose }) {
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
 
-  const navItems = [
-    { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { label: 'Transactions', path: '/transactions', icon: Receipt },
-    { label: 'Budgets', path: '/budgets', icon: PieChart },
-    { label: 'Savings Goals', path: '/goals', icon: Target },
-    { label: 'Analytics', path: '/analytics', icon: BarChart3 },
-    { label: 'Subscriptions', path: '/subscriptions', icon: CreditCard },
-    { label: 'Recurring', path: '/recurring', icon: Repeat },
-    { label: 'Insights', path: '/insights', icon: Sparkles },
-    { label: 'Profile', path: '/profile', icon: User },
+  const primaryLinks = [
+    { name: t('nav.dashboard'), path: '/dashboard', icon: LayoutDashboard },
+    { name: t('nav.transactions'), path: '/transactions', icon: Receipt },
+    { name: t('nav.budgets'), path: '/budgets', icon: PieChart }
   ];
 
-  if (!isOpen) return null;
+  const secondaryLinks = [
+    { name: t('nav.goals'), path: '/goals', icon: Target },
+    { name: t('nav.subscriptions'), path: '/subscriptions', icon: CreditCard },
+    { name: t('nav.recurring'), path: '/recurring', icon: Repeat },
+    { name: t('nav.analytics'), path: '/analytics', icon: BarChart3 },
+    { name: t('nav.insights'), path: '/insights', icon: Sparkles },
+    { name: t('nav.profile'), path: '/profile', icon: Settings }
+  ];
 
   return (
-    <div className="fixed inset-0 z-50 md:hidden flex">
-      {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs animate-fade-in" 
-        onClick={onClose} 
-      />
-
-      {/* Drawer */}
-      <div className="relative flex-1 max-w-xs w-full bg-slate-900 text-slate-200 flex flex-col h-full z-10 shadow-2xl animate-fade-in">
-        <div className="h-16 px-6 flex items-center justify-between border-b border-slate-800">
-          <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-sky-600 rounded-xl text-white">
-              <Wallet className="w-5 h-5" />
-            </div>
-            <span className="font-bold text-white tracking-tight">FinTrack PRO</span>
-          </div>
-          <button onClick={onClose} className="p-1.5 text-slate-400 hover:text-white rounded-lg">
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            return (
+    <>
+      {/* Slide-Over Overflow Drawer */}
+      <Drawer
+        isOpen={isOpen}
+        onClose={onClose}
+        title="FinTrack Workspace"
+        subtitle={user?.email}
+        position="left"
+        maxWidth="max-w-xs"
+      >
+        <div className="space-y-6">
+          <nav className="space-y-1">
+            {[...primaryLinks, ...secondaryLinks].map((link) => (
               <NavLink
-                key={item.path}
-                to={item.path}
+                key={link.path}
+                to={link.path}
                 onClick={onClose}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-semibold transition-colors ${
+                  `flex items-center gap-3 px-3.5 py-3 rounded-xl text-xs font-bold transition-all ${
                     isActive
-                      ? 'bg-slate-800 text-white font-bold'
-                      : 'text-slate-400 hover:bg-slate-800/60 hover:text-slate-200'
+                      ? 'bg-sky-600 text-white shadow-sm'
+                      : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                   }`
                 }
               >
-                <Icon className="w-4 h-4 text-sky-400" />
-                <span>{item.label}</span>
+                <link.icon className="w-4 h-4 shrink-0" />
+                <span>{link.name}</span>
               </NavLink>
-            );
-          })}
-        </nav>
+            ))}
+          </nav>
 
-        <div className="p-4 border-t border-slate-800">
-          <button
-            onClick={() => { logout(); onClose(); }}
-            className="w-full py-2.5 px-4 bg-rose-950/60 text-rose-400 border border-rose-800/50 text-xs font-bold rounded-xl"
-          >
-            Sign out
-          </button>
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
+            <button
+              onClick={() => { onClose(); logout(); }}
+              className="w-full flex items-center gap-3 px-3.5 py-3 text-xs font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition-colors"
+            >
+              <LogOut className="w-4 h-4" />
+              <span>{t('nav.logout')}</span>
+            </button>
+          </div>
         </div>
-      </div>
-    </div>
+      </Drawer>
+
+      {/* Fixed Bottom Navigation Bar (Mobile Viewports Only) */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-t border-slate-200/80 dark:border-slate-800 px-4 py-2 flex items-center justify-around">
+        {primaryLinks.map((link) => (
+          <NavLink
+            key={link.path}
+            to={link.path}
+            className={({ isActive }) =>
+              `flex flex-col items-center gap-1 p-1 text-[10px] font-bold transition-colors ${
+                isActive ? 'text-sky-600 dark:text-sky-400' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'
+              }`
+            }
+          >
+            <link.icon className="w-5 h-5" />
+            <span>{link.name}</span>
+          </NavLink>
+        ))}
+
+        <button
+          onClick={onClose}
+          className="flex flex-col items-center gap-1 p-1 text-[10px] font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+        >
+          <MoreHorizontal className="w-5 h-5" />
+          <span>More</span>
+        </button>
+      </nav>
+    </>
   );
 }

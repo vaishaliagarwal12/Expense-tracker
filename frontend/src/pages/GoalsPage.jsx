@@ -1,27 +1,32 @@
 import React, { useState, useEffect } from 'react';
 import { goalApi } from '../services/goalApi';
 import { useAuth } from '../context/AuthContext';
-import { formatCurrency } from '../utils/currency';
+import { useLanguage } from '../context/LanguageContext';
+import { useToast } from '../context/ToastContext';
+import { useCurrency } from '../context/CurrencyContext';
 import { formatDate } from '../utils/date';
 import ProgressBar from '../components/common/ProgressBar';
-import Badge from '../components/common/Badge';
-import MetricCard from '../components/common/MetricCard';
-import { CardSkeleton } from '../components/common/Skeleton';
-import EmptyState from '../components/common/EmptyState';
+import Badge from '../components/ui/Badge';
+import Button from '../components/ui/Button';
+import { CardSkeleton } from '../components/ui/Skeleton';
+import EmptyState from '../components/ui/EmptyState';
 import GoalModal from '../components/goals/GoalModal';
 import DepositModal from '../components/goals/DepositModal';
-import { Plus, Target, Edit3, Trash2, PiggyBank, Calendar, CheckCircle2, Award, Clock } from 'lucide-react';
+import { Plus, Target, PiggyBank, Edit3, Trash2, Calendar } from 'lucide-react';
 
 export default function GoalsPage() {
   const { user } = useAuth();
+  const { t } = useLanguage();
+  const { showSuccess, showError } = useToast();
+  const { format } = useCurrency();
   const symbol = user?.currency_symbol || '₹';
 
   const [goals, setGoals] = useState([]);
-  const [summary, setSummary] = useState({ totalGoals: 0, totalTarget: 0, totalSaved: 0, overallProgress: 0 });
   const [loading, setLoading] = useState(true);
 
   const [isGoalModalOpen, setIsGoalModalOpen] = useState(false);
   const [editingGoal, setEditingGoal] = useState(null);
+
   const [depositGoal, setDepositGoal] = useState(null);
 
   const fetchGoals = async () => {
@@ -29,7 +34,6 @@ export default function GoalsPage() {
       setLoading(true);
       const res = await goalApi.getGoals();
       setGoals(res.data?.goals || []);
-      setSummary(res.data?.summary || { totalGoals: 0, totalTarget: 0, totalSaved: 0, overallProgress: 0 });
     } catch (err) {
       console.error('Failed to fetch goals:', err);
     } finally {
@@ -42,12 +46,13 @@ export default function GoalsPage() {
   }, []);
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this savings goal?')) return;
+    if (!window.confirm('Delete this savings milestone?')) return;
     try {
       await goalApi.delete(id);
+      showSuccess('Savings goal deleted');
       fetchGoals();
     } catch (err) {
-      alert('Failed to delete savings goal');
+      showError('Failed to delete goal');
     }
   };
 
@@ -56,132 +61,109 @@ export default function GoalsPage() {
       {/* Header Action Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Savings Goals</h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Plan and save for major purchases, emergency funds, & life targets</p>
+          <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">{t('goals.title')}</h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{t('goals.subtitle')}</p>
         </div>
 
-        <button
+        <Button
+          variant="primary"
+          size="sm"
+          icon={Plus}
           onClick={() => { setEditingGoal(null); setIsGoalModalOpen(true); }}
-          className="flex items-center gap-1.5 px-4 py-2 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white text-xs font-bold rounded-xl shadow-xs transition-colors self-start sm:self-auto"
         >
-          <Plus className="w-4 h-4" /> Create Savings Goal
-        </button>
+          {t('goals.create')}
+        </Button>
       </div>
 
-      {/* Summary KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <MetricCard
-          title="Total Target Amount"
-          value={formatCurrency(summary.totalTarget, symbol)}
-          subtitle={`Across ${summary.totalGoals} savings goals`}
-          icon={Target}
-          color="sky"
-        />
-        <MetricCard
-          title="Total Currently Saved"
-          value={formatCurrency(summary.totalSaved, symbol)}
-          subtitle="Total accumulated savings"
-          icon={PiggyBank}
-          color="emerald"
-        />
-        <MetricCard
-          title="Overall Progress"
-          value={`${summary.overallProgress}%`}
-          subtitle="Cumulative completion rate"
-          icon={Award}
-          color="indigo"
-        />
-      </div>
-
-      {/* Goal Cards Grid */}
+      {/* Goals Cards Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <CardSkeleton className="h-56" />
-          <CardSkeleton className="h-56" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <CardSkeleton className="h-52" />
+          <CardSkeleton className="h-52" />
+          <CardSkeleton className="h-52" />
         </div>
       ) : goals.length === 0 ? (
         <EmptyState 
           icon={Target}
-          title="No Savings Goals Defined" 
-          description="Create savings targets (e.g. Emergency Fund, Laptop, Vacation) to compute required monthly savings."
-          actionLabel="Create Savings Goal"
+          title={t('goals.emptyTitle')} 
+          description={t('goals.emptySub')}
+          actionLabel={t('goals.create')}
           onAction={() => { setEditingGoal(null); setIsGoalModalOpen(true); }}
           className="py-16"
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {goals.map(g => (
             <div key={g.id} className="fin-card fin-card-hover p-6 flex flex-col justify-between space-y-4">
-              <div>
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-base font-bold text-slate-900 dark:text-white">{g.name}</h3>
-                      {g.isCompleted ? (
-                        <Badge variant="success" icon={CheckCircle2}>Completed</Badge>
-                      ) : (
-                        <Badge variant="info">{g.progressPercentage}% Complete</Badge>
-                      )}
-                    </div>
-                    {g.description && <p className="text-xs text-slate-500 dark:text-slate-400">{g.description}</p>}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2.5 bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 rounded-xl">
+                    <Target className="w-5 h-5" />
                   </div>
-                  <div className="flex items-center gap-1">
-                    <button
-                      onClick={() => { setEditingGoal(g); setIsGoalModalOpen(true); }}
-                      className="p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-slate-700 rounded-xl transition-colors"
-                      title="Edit Goal"
-                    >
-                      <Edit3 className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(g.id)}
-                      className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-700 rounded-xl transition-colors"
-                      title="Delete Goal"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
+                  <div>
+                    <h3 className="text-base font-extrabold text-slate-900 dark:text-white">{g.name}</h3>
+                    {g.target_date && (
+                      <p className="text-[11px] text-slate-400 font-medium flex items-center gap-1">
+                        <Calendar className="w-3 h-3" /> {formatDate(g.target_date)}
+                      </p>
+                    )}
                   </div>
                 </div>
 
-                {/* Progress Bar & Numerical Amounts */}
-                <div className="mt-4 space-y-2">
-                  <ProgressBar value={g.current_saved} max={g.target_amount} status={g.isCompleted ? 'success' : 'normal'} showText={false} height="h-2.5" />
-                  <div className="flex justify-between items-center text-xs font-semibold">
-                    <span className="text-slate-500">Saved: <strong className="text-emerald-600 dark:text-emerald-400">{formatCurrency(g.current_saved, symbol)}</strong></span>
-                    <span className="text-slate-500">Target: <strong className="text-slate-900 dark:text-white">{formatCurrency(g.target_amount, symbol)}</strong></span>
-                  </div>
+                <div className="flex items-center gap-1">
+                  <button
+                    onClick={() => { setEditingGoal(g); setIsGoalModalOpen(true); }}
+                    className="p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(g.id)}
+                    className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
 
-              {/* Deadline & Required Monthly Savings */}
-              <div className="p-3 bg-slate-50 dark:bg-slate-900/60 rounded-xl space-y-2 text-xs border border-slate-100 dark:border-slate-700/60">
-                <div className="flex justify-between items-center text-slate-600 dark:text-slate-400">
-                  <span className="flex items-center gap-1.5 font-medium"><Calendar className="w-3.5 h-3.5 text-sky-600" /> Target Deadline:</span>
-                  <span className="font-bold text-slate-900 dark:text-white">{formatDate(g.deadline)}</span>
+              {/* Progress Bar */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs font-bold">
+                  <span className="text-slate-500">{t('goals.progress')}</span>
+                  <span className="text-sky-600 dark:text-sky-400">{g.progressPercentage}%</span>
                 </div>
-                {!g.isCompleted && g.requiredMonthlySavings > 0 && (
-                  <div className="flex justify-between items-center text-slate-600 dark:text-slate-400 pt-1.5 border-t border-slate-200/60 dark:border-slate-700/60">
-                    <span className="flex items-center gap-1 font-medium"><Clock className="w-3.5 h-3.5 text-amber-500" /> Required Monthly Savings:</span>
-                    <span className="font-extrabold text-sky-600 dark:text-sky-400">{formatCurrency(g.requiredMonthlySavings, symbol)}/mo</span>
-                  </div>
-                )}
+                <ProgressBar value={g.current_saved} max={g.target_amount} status="success" showText={false} height="h-3" />
               </div>
 
-              {/* Deposit Action */}
-              {!g.isCompleted && (
-                <button
-                  onClick={() => setDepositGoal(g)}
-                  className="w-full py-2.5 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100 dark:hover:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 font-bold text-xs rounded-xl flex items-center justify-center gap-2 border border-emerald-200/60 dark:border-emerald-800/60 transition-colors"
-                >
-                  <PiggyBank className="w-4 h-4" /> Add Deposit To Goal
-                </button>
-              )}
+              {/* Metrics Breakdown */}
+              <div className="grid grid-cols-2 text-xs pt-3 border-t border-slate-100 dark:border-slate-800">
+                <div>
+                  <span className="text-slate-400 block text-[11px]">{t('goals.saved')}</span>
+                  <span className="font-extrabold text-emerald-600 dark:text-emerald-400">{format(g.current_saved)}</span>
+                </div>
+                <div className="text-right">
+                  <span className="text-slate-400 block text-[11px]">{t('goals.target')}</span>
+                  <span className="font-extrabold text-slate-900 dark:text-white">{format(g.target_amount)}</span>
+                </div>
+
+              </div>
+
+              {/* Deposit Quick Action */}
+              <Button
+                variant="secondary"
+                size="sm"
+                fullWidth
+                icon={PiggyBank}
+                onClick={() => setDepositGoal(g)}
+              >
+                {t('goals.deposit')}
+              </Button>
             </div>
           ))}
         </div>
       )}
 
-      {/* Modals */}
+      {/* Goal Add/Edit Modal */}
       {isGoalModalOpen && (
         <GoalModal
           isOpen={isGoalModalOpen}
@@ -189,11 +171,13 @@ export default function GoalsPage() {
           goalToEdit={editingGoal}
           onSuccess={() => {
             setIsGoalModalOpen(false);
+            showSuccess('Goal updated');
             fetchGoals();
           }}
         />
       )}
 
+      {/* Deposit Modal */}
       {depositGoal && (
         <DepositModal
           isOpen={!!depositGoal}
@@ -201,6 +185,7 @@ export default function GoalsPage() {
           goal={depositGoal}
           onSuccess={() => {
             setDepositGoal(null);
+            showSuccess('Deposit logged');
             fetchGoals();
           }}
         />

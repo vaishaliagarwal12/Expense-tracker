@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { transactionApi } from '../services/transactionApi';
 import { useAuth } from '../context/AuthContext';
-import { formatCurrency } from '../utils/currency';
+import { useLanguage } from '../context/LanguageContext';
+import { useToast } from '../context/ToastContext';
+import { useCurrency } from '../context/CurrencyContext';
 import { formatDate } from '../utils/date';
 import TransactionModal from '../components/transactions/TransactionModal';
 import ReceiptViewerModal from '../components/transactions/ReceiptViewerModal';
 import CsvImportModal from '../components/transactions/CsvImportModal';
-import Badge from '../components/common/Badge';
-import { TableRowSkeleton } from '../components/common/Skeleton';
-import EmptyState from '../components/common/EmptyState';
+import Button from '../components/ui/Button';
+import { Input, Select } from '../components/ui/Input';
+import Badge from '../components/ui/Badge';
+import { TableRowSkeleton } from '../components/ui/Skeleton';
+import EmptyState from '../components/ui/EmptyState';
 import { 
   Plus, 
   Search, 
@@ -21,14 +25,20 @@ import {
   ChevronRight,
   Eye,
   RotateCcw,
-  Calendar
+  Calendar,
+  Filter
 } from 'lucide-react';
 
 const CATEGORIES = ['All', 'Salary', 'Freelancing', 'Scholarship', 'Business', 'Investment', 'Food', 'Transport', 'Shopping', 'Education', 'Entertainment', 'Bills', 'Healthcare', 'Travel', 'Rent', 'Other'];
 
 export default function TransactionsPage() {
   const { user } = useAuth();
-  const symbol = user?.currency_symbol || '₹';
+  const { t } = useLanguage();
+  const { showSuccess, showError } = useToast();
+  const { format } = useCurrency();
+
+
+
 
   const [transactions, setTransactions] = useState([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -84,13 +94,14 @@ export default function TransactionsPage() {
   }, [search, category, type, startDate, endDate, sortBy, sortOrder, page]);
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this transaction record?')) return;
+    if (!window.confirm(t('transactions.deleteConfirm'))) return;
     try {
       await transactionApi.delete(id);
+      showSuccess('Transaction deleted');
       fetchTransactions();
       window.dispatchEvent(new CustomEvent('fintrack_transaction_updated'));
     } catch (err) {
-      alert(err.message || 'Failed to delete transaction');
+      showError(err.message || 'Failed to delete transaction');
     }
   };
 
@@ -104,8 +115,9 @@ export default function TransactionsPage() {
       document.body.appendChild(link);
       link.click();
       link.remove();
+      showSuccess('CSV exported successfully');
     } catch (err) {
-      alert('Failed to export CSV');
+      showError('Failed to export CSV');
     }
   };
 
@@ -114,88 +126,68 @@ export default function TransactionsPage() {
       {/* Header Action Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-4">
         <div>
-          <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Transactions Directory</h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Total {totalCount} transactions logged in workspace</p>
+          <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">{t('transactions.title')}</h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{t('transactions.subtitle', { count: totalCount })}</p>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          <button
-            onClick={() => setIsCsvModalOpen(true)}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 transition-colors"
-          >
-            <Upload className="w-3.5 h-3.5" /> Import CSV
-          </button>
-          <button
-            onClick={handleExportCsv}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-semibold rounded-xl border border-slate-200 dark:border-slate-700 transition-colors"
-          >
-            <Download className="w-3.5 h-3.5" /> Export CSV
-          </button>
-          <button
-            onClick={() => { setEditingTx(null); setIsTxModalOpen(true); }}
-            className="flex items-center gap-1.5 px-4 py-2 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
-          >
-            <Plus className="w-4 h-4" /> Add Transaction
-          </button>
+          <Button variant="secondary" size="sm" icon={Upload} onClick={() => setIsCsvModalOpen(true)}>
+            {t('transactions.importCsv')}
+          </Button>
+          <Button variant="secondary" size="sm" icon={Download} onClick={handleExportCsv}>
+            {t('transactions.exportCsv')}
+          </Button>
+          <Button variant="primary" size="sm" icon={Plus} onClick={() => { setEditingTx(null); setIsTxModalOpen(true); }}>
+            {t('transactions.add')}
+          </Button>
         </div>
       </div>
 
       {/* Multi-Column Search & Filter Toolbar */}
       <div className="fin-card p-4 space-y-3">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {/* Search Input */}
-          <div className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-2.5" />
-            <input
-              type="text"
-              placeholder="Search description or category..."
-              value={search}
-              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-              className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200/90 dark:border-slate-700 rounded-xl text-xs text-slate-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-none"
-            />
-          </div>
+          <Input
+            icon={Search}
+            placeholder={t('transactions.search')}
+            value={search}
+            onChange={(e) => { setSearch(e.target.value); setPage(1); }}
+          />
 
-          {/* Category Filter */}
-          <select
+          <Select
             value={category}
             onChange={(e) => { setCategory(e.target.value); setPage(1); }}
-            className="px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200/90 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-none"
           >
             {CATEGORIES.map(c => (
-              <option key={c} value={c}>{c === 'All' ? 'All Categories' : c}</option>
+              <option key={c} value={c}>{c === 'All' ? t('transactions.allCategories') : c}</option>
             ))}
-          </select>
+          </Select>
 
-          {/* Type Filter */}
-          <select
+          <Select
             value={type}
             onChange={(e) => { setType(e.target.value); setPage(1); }}
-            className="px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200/90 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-none"
           >
-            <option value="All">All Types (Income & Expense)</option>
-            <option value="income">Income Only</option>
-            <option value="expense">Expense Only</option>
-          </select>
+            <option value="All">{t('transactions.allTypes')}</option>
+            <option value="income">{t('transactions.income')}</option>
+            <option value="expense">{t('transactions.expense')}</option>
+          </Select>
 
-          {/* Sorting */}
-          <select
+          <Select
             value={`${sortBy}_${sortOrder}`}
             onChange={(e) => {
               const [sb, so] = e.target.value.split('_');
               setSortBy(sb);
               setSortOrder(so);
             }}
-            className="px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200/90 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-none"
           >
             <option value="date_DESC">Sort: Date (Latest First)</option>
             <option value="date_ASC">Sort: Date (Oldest First)</option>
             <option value="amount_DESC">Sort: Amount (Highest First)</option>
             <option value="amount_ASC">Sort: Amount (Lowest First)</option>
-          </select>
+          </Select>
         </div>
 
         {/* Date Range Inputs Bar */}
-        <div className="flex items-center gap-3 pt-2.5 border-t border-slate-100 dark:border-slate-700/60 text-xs">
+        <div className="flex items-center gap-3 pt-2.5 border-t border-slate-100 dark:border-slate-800 text-xs flex-wrap">
           <span className="font-bold text-slate-500 dark:text-slate-400 flex items-center gap-1">
             <Calendar className="w-3.5 h-3.5 text-sky-600" /> Date Range:
           </span>
@@ -223,22 +215,22 @@ export default function TransactionsPage() {
         </div>
       </div>
 
-      {/* Transactions Data Table */}
+      {/* Transactions Data Ledger Table */}
       <div className="fin-card overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
             <thead>
-              <tr className="bg-slate-50 dark:bg-slate-900/80 border-b border-slate-200/80 dark:border-slate-700/80 text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                <th className="px-5 py-3.5">Date</th>
+              <tr className="bg-slate-50 dark:bg-slate-900/80 border-b border-slate-200/80 dark:border-slate-800 text-[11px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                <th className="px-5 py-3.5">{t('transactions.date')}</th>
                 <th className="px-5 py-3.5">Description</th>
-                <th className="px-5 py-3.5">Category</th>
-                <th className="px-5 py-3.5">Payment Method</th>
-                <th className="px-5 py-3.5 text-right">Amount</th>
-                <th className="px-5 py-3.5 text-center">Receipt</th>
+                <th className="px-5 py-3.5">{t('transactions.category')}</th>
+                <th className="px-5 py-3.5">{t('transactions.paymentMethod')}</th>
+                <th className="px-5 py-3.5 text-right">{t('transactions.amount')}</th>
+                <th className="px-5 py-3.5 text-center">{t('transactions.receipt')}</th>
                 <th className="px-5 py-3.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60 text-xs">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-xs">
               {loading ? (
                 Array.from({ length: 6 }).map((_, i) => <TableRowSkeleton key={i} columns={7} />)
               ) : transactions.length === 0 ? (
@@ -246,9 +238,9 @@ export default function TransactionsPage() {
                   <td colSpan={7} className="py-8">
                     <EmptyState 
                       icon={Receipt}
-                      title="No Transactions Found" 
-                      description="No records match your selected search terms or category filters."
-                      actionLabel="Log New Transaction"
+                      title={t('transactions.emptyTitle')} 
+                      description={t('transactions.emptySub')}
+                      actionLabel={t('transactions.add')}
                       onAction={() => { setEditingTx(null); setIsTxModalOpen(true); }}
                       className="border-none shadow-none"
                     />
@@ -256,7 +248,7 @@ export default function TransactionsPage() {
                 </tr>
               ) : (
                 transactions.map((tx) => (
-                  <tr key={tx.id} className="hover:bg-slate-50/70 dark:hover:bg-slate-700/40 transition-colors">
+                  <tr key={tx.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors">
                     <td className="px-5 py-4 font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap">
                       {formatDate(tx.date)}
                     </td>
@@ -265,9 +257,9 @@ export default function TransactionsPage() {
                       {tx.notes && <span className="block text-[11px] font-normal text-slate-400 truncate max-w-xs">{tx.notes}</span>}
                     </td>
                     <td className="px-5 py-4 whitespace-nowrap">
-                      <span className="px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                      <Badge variant="neutral">
                         {tx.category}
-                      </span>
+                      </Badge>
                     </td>
                     <td className="px-5 py-4 text-slate-500 dark:text-slate-400 font-medium whitespace-nowrap">
                       {tx.payment_method}
@@ -275,14 +267,15 @@ export default function TransactionsPage() {
                     <td className={`px-5 py-4 text-right font-extrabold whitespace-nowrap ${
                       tx.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-900 dark:text-white'
                     }`}>
-                      {tx.type === 'income' ? '+' : '-'}{formatCurrency(tx.amount, symbol)}
+                      {tx.type === 'income' ? '+' : '-'}{format(tx.amount)}
+
                     </td>
                     <td className="px-5 py-4 text-center whitespace-nowrap">
                       {tx.receipt_url ? (
                         <button
                           onClick={() => { setViewReceiptUrl(tx.receipt_url); setViewReceiptDesc(tx.description); }}
                           className="p-1.5 text-sky-600 hover:bg-sky-50 dark:hover:bg-sky-950/50 rounded-xl transition-colors"
-                          title="View Receipt Document"
+                          title={t('transactions.viewReceipt')}
                         >
                           <Eye className="w-4 h-4" />
                         </button>
@@ -293,15 +286,15 @@ export default function TransactionsPage() {
                     <td className="px-5 py-4 text-right space-x-1 whitespace-nowrap">
                       <button
                         onClick={() => { setEditingTx(tx); setIsTxModalOpen(true); }}
-                        className="p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-slate-700 rounded-xl transition-colors"
-                        title="Edit Transaction"
+                        className="p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
+                        title={t('transactions.edit')}
                       >
                         <Edit3 className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDelete(tx.id)}
-                        className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-700 rounded-xl transition-colors"
-                        title="Delete Transaction"
+                        className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
+                        title={t('transactions.delete')}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -315,7 +308,7 @@ export default function TransactionsPage() {
 
         {/* Pagination Controls */}
         {totalPages > 1 && (
-          <div className="px-5 py-3.5 bg-slate-50 dark:bg-slate-900/80 border-t border-slate-200 dark:border-slate-700/80 flex items-center justify-between text-xs">
+          <div className="px-5 py-3.5 bg-slate-50 dark:bg-slate-900/80 border-t border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs">
             <span className="text-slate-500 dark:text-slate-400 font-medium">Page {page} of {totalPages} ({totalCount} items)</span>
             <div className="flex items-center gap-2">
               <button
@@ -345,6 +338,7 @@ export default function TransactionsPage() {
           transactionToEdit={editingTx}
           onSuccess={() => {
             setIsTxModalOpen(false);
+            showSuccess('Transaction saved');
             fetchTransactions();
             window.dispatchEvent(new CustomEvent('fintrack_transaction_updated'));
           }}
@@ -368,6 +362,7 @@ export default function TransactionsPage() {
           onClose={() => setIsCsvModalOpen(false)}
           onSuccess={() => {
             setIsCsvModalOpen(false);
+            showSuccess('CSV imported successfully');
             fetchTransactions();
             window.dispatchEvent(new CustomEvent('fintrack_transaction_updated'));
           }}

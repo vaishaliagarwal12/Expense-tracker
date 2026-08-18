@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -7,11 +9,18 @@
     font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background-color: #f8fafc;
     color: #0f172a;
+    scroll-behavior: smooth;
   }
   
+  html.dark {
+    background-color: #090d16;
+    color: #f8fafc;
+  }
+
   body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 }
 
@@ -27,38 +36,42 @@
 
 ::-webkit-scrollbar-thumb {
   background: #cbd5e1;
-  border-radius: 4px;
+  border-radius: 9999px;
 }
 
 .dark ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: #1f2937;
 }
 
 ::-webkit-scrollbar-thumb:hover {
   background: #94a3b8;
 }
 
-/* Fintech SaaS Card Standard Utilities */
+/* FinTrack Standard Card Utility Classes */
 .fin-card {
   background-color: #ffffff;
   border: 1px solid rgba(226, 232, 240, 0.8);
-  border-radius: 1rem;
-  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  border-radius: 1.25rem;
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .dark .fin-card {
-  background-color: #1e293b;
-  border: 1px solid rgba(51, 65, 85, 0.8);
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.2);
+  background-color: #111827;
+  border: 1px solid rgba(31, 41, 55, 0.8);
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
 }
 
 .fin-card-hover:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 12px 24px -6px rgba(15, 23, 42, 0.08);
 }
 
-/* Shimmer animation for loading skeletons */
+.dark .fin-card-hover:hover {
+  box-shadow: 0 12px 24px -6px rgba(0, 0, 0, 0.5);
+}
+
+/* Shimmer Loading Skeleton Animation */
 @keyframes shimmer {
   0% {
     background-position: -200% 0;
@@ -75,7 +88,7 @@
 }
 
 .dark .skeleton-shimmer {
-  background: linear-gradient(90deg, #1e293b 25%, #334155 37%, #1e293b 63%);
+  background: linear-gradient(90deg, #111827 25%, #1f2937 37%, #111827 63%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }

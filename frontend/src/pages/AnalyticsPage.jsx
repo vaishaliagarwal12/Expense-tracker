@@ -2,22 +2,20 @@ import React, { useState, useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { analyticsApi } from '../services/analyticsApi';
 import { useAuth } from '../context/AuthContext';
-import { formatCurrency } from '../utils/currency';
-import MetricCard from '../components/common/MetricCard';
-import Badge from '../components/common/Badge';
-import { CardSkeleton, ChartSkeleton } from '../components/common/Skeleton';
-import EmptyState from '../components/common/EmptyState';
+import { useLanguage } from '../context/LanguageContext';
+import { ChartSkeleton } from '../components/ui/Skeleton';
+
+import EmptyState from '../components/ui/EmptyState';
+import Badge from '../components/ui/Badge';
 import { 
   BarChart3, 
   TrendingUp, 
   TrendingDown, 
-  PiggyBank, 
-  Calendar, 
-  Award,
-  Clock,
+  PieChart as PieIcon,
+  HelpCircle,
+  Sparkles,
   ArrowUpRight,
-  ArrowDownRight,
-  PieChart as PieIcon
+  ArrowDownRight
 } from 'lucide-react';
 import {
   ResponsiveContainer,
@@ -34,151 +32,91 @@ import {
   Cell
 } from 'recharts';
 
-const COLORS = ['#0284C7', '#F43F5E', '#10B981', '#F59E0B', '#6366F1', '#EC4899', '#06B6D4', '#64748B'];
+const CATEGORY_COLORS = ['#0284C7', '#F43F5E', '#10B981', '#F59E0B', '#6366F1', '#EC4899', '#06B6D4', '#64748B'];
 
 export default function AnalyticsPage() {
   const { selectedMonth } = useOutletContext();
   const { user } = useAuth();
-  const symbol = user?.currency_symbol || '₹';
+  const { t } = useLanguage();
+  const { format, formatRaw, convert } = useCurrency();
 
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchAnalytics = async () => {
-    try {
-      setLoading(true);
-      const res = await analyticsApi.getAnalytics(selectedMonth);
-      setAnalytics(res.data);
-    } catch (err) {
-      console.error('Failed to load analytics:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        setLoading(true);
+        const res = await analyticsApi.getAnalytics(selectedMonth);
+        setAnalytics(res.data);
+      } catch (err) {
+        console.error('Failed to fetch analytics:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
     fetchAnalytics();
   }, [selectedMonth]);
 
   if (loading || !analytics) {
     return (
       <div className="space-y-6 pb-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <CardSkeleton />
-          <CardSkeleton />
-          <CardSkeleton />
-          <CardSkeleton />
-        </div>
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <ChartSkeleton />
-          <ChartSkeleton />
-        </div>
+        <ChartSkeleton />
+        <ChartSkeleton />
+        <ChartSkeleton />
       </div>
     );
   }
 
   const { metrics, momComparison, expenseCategories, monthlyTrend } = analytics;
 
-  const pieChartData = expenseCategories.map(c => ({
-    name: c.category,
-    value: c.total
+  const incomeVsExpenseData = [
+    { name: selectedMonth, Income: convert(metrics.income), Expenses: convert(metrics.expenses) }
+  ];
+
+  const pieChartData = (expenseCategories || []).map(cat => ({
+    name: cat.category,
+    value: convert(cat.total)
+  }));
+
+  const convertedMonthlyTrend = (monthlyTrend || []).map(item => ({
+    month_year: item.month_year,
+    income: convert(item.income),
+    expense: convert(item.expense)
   }));
 
   return (
     <div className="space-y-6 animate-fade-in pb-12">
-      {/* Header */}
+      {/* Header Bar */}
       <div className="border-b border-slate-200/80 dark:border-slate-800 pb-4">
-        <h2 className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">Financial Analytics & MoM Breakdown</h2>
-        <p className="text-xs text-slate-500 dark:text-slate-400">Deep-dive into income vs expense ratios, spending pace, and category distributions ({selectedMonth})</p>
+        <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">{t('analytics.title')}</h2>
+        <p className="text-xs text-slate-500 dark:text-slate-400">{t('analytics.subtitle')} ({selectedMonth})</p>
       </div>
 
-      {/* Primary Summary Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <MetricCard
-          title="Monthly Income"
-          value={formatCurrency(metrics.income, symbol)}
-          trend={momComparison.incomeChangePct >= 0 ? 'up' : 'down'}
-          trendText={`${Math.abs(momComparison.incomeChangePct)}% vs prev month`}
-          icon={TrendingUp}
-          color="emerald"
-        />
-        <MetricCard
-          title="Monthly Expenses"
-          value={formatCurrency(metrics.expenses, symbol)}
-          trend={momComparison.expenseChangePct <= 0 ? 'up' : 'down'}
-          trendText={`${Math.abs(momComparison.expenseChangePct)}% vs prev month`}
-          icon={TrendingDown}
-          color="rose"
-        />
-        <MetricCard
-          title="Net Savings"
-          value={formatCurrency(metrics.savings, symbol)}
-          subtitle={`Savings Rate: ${metrics.savingsRate}%`}
-          icon={PiggyBank}
-          color="indigo"
-        />
-        <MetricCard
-          title="Avg Daily Pace"
-          value={`${formatCurrency(metrics.avgDailySpending, symbol)}/day`}
-          subtitle={`${metrics.daysElapsed} days elapsed in month`}
-          icon={Clock}
-          color="sky"
-        />
-      </div>
-
-      {/* Month-over-Month Performance Banner */}
+      {/* Decision-Making Question 1: "Where did my money go?" */}
       <div className="fin-card p-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-sky-600" /> Month-over-Month (MoM) Performance
-          </h3>
-          <Badge variant="info">Comparison Active</Badge>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 rounded-xl">
+              <PieIcon className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
+                {t('analytics.whereMoneyWent')}
+              </h3>
+              <p className="text-xs text-slate-400">Expense category allocation breakdown</p>
+            </div>
+          </div>
+
+          <Badge variant="info">
+            Top Category: {expenseCategories.length > 0 ? expenseCategories[0].category : 'N/A'}
+          </Badge>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="p-4 bg-slate-50 dark:bg-slate-900/60 rounded-xl space-y-1.5 border border-slate-100 dark:border-slate-800">
-            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Income Shift</span>
-            <div className="flex items-center justify-between">
-              <span className="text-lg font-black text-slate-900 dark:text-white">{formatCurrency(metrics.income, symbol)}</span>
-              <span className={`text-xs font-bold flex items-center ${momComparison.incomeChangePct >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                {momComparison.incomeChangePct >= 0 ? <ArrowUpRight className="w-4 h-4" /> : <ArrowDownRight className="w-4 h-4" />}
-                {Math.abs(momComparison.incomeChangePct)}%
-              </span>
-            </div>
-            <span className="text-[11px] text-slate-400 block">Prev month: {formatCurrency(momComparison.prevIncome, symbol)}</span>
-          </div>
-
-          <div className="p-4 bg-slate-50 dark:bg-slate-900/60 rounded-xl space-y-1.5 border border-slate-100 dark:border-slate-800">
-            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Expense Shift</span>
-            <div className="flex items-center justify-between">
-              <span className="text-lg font-black text-slate-900 dark:text-white">{formatCurrency(metrics.expenses, symbol)}</span>
-              <span className={`text-xs font-bold flex items-center ${momComparison.expenseChangePct <= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
-                {momComparison.expenseChangePct <= 0 ? <ArrowDownRight className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
-                {Math.abs(momComparison.expenseChangePct)}%
-              </span>
-            </div>
-            <span className="text-[11px] text-slate-400 block">Prev month: {formatCurrency(momComparison.prevExpenses, symbol)}</span>
-          </div>
-
-          <div className="p-4 bg-slate-50 dark:bg-slate-900/60 rounded-xl space-y-1.5 border border-slate-100 dark:border-slate-800">
-            <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Top Expense Category</span>
-            <div className="flex items-center justify-between">
-              <span className="text-lg font-black text-slate-900 dark:text-white">{metrics.highestCategory?.category || 'None'}</span>
-              <Award className="w-5 h-5 text-amber-500 shrink-0" />
-            </div>
-            <span className="text-[11px] text-slate-400 block">Spent: {formatCurrency(metrics.highestCategory?.total || 0, symbol)}</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Visual Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Category Breakdown Pie Chart */}
-        <div className="fin-card p-6 space-y-4">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Category Distribution</h3>
-          <div className="h-64">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+          <div className="lg:col-span-2 h-72">
             {pieChartData.length === 0 ? (
-              <div className="h-full flex items-center justify-center text-xs text-slate-400">No expense records for selected month</div>
+              <EmptyState title="No Expenses Recorded" description="Log expense entries to analyze category distribution." />
             ) : (
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
@@ -186,76 +124,132 @@ export default function AnalyticsPage() {
                     data={pieChartData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={50}
-                    outerRadius={80}
-                    paddingAngle={3}
+                    innerRadius={60}
+                    outerRadius={90}
+                    paddingAngle={4}
                     dataKey="value"
                   >
-                    {pieChartData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    {pieChartData.map((_, idx) => (
+                      <Cell key={`cell-${idx}`} fill={CATEGORY_COLORS[idx % CATEGORY_COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value) => formatCurrency(value, symbol)} />
+                  <Tooltip formatter={(val) => formatRaw(val)} />
                   <Legend />
                 </PieChart>
               </ResponsiveContainer>
             )}
           </div>
-        </div>
 
-        {/* 6 Month Trend Bar Chart */}
-        <div className="fin-card p-6 space-y-4">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Monthly Income & Expense Trend</h3>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={monthlyTrend}>
-                <XAxis dataKey="month_year" stroke="#94a3b8" fontSize={11} />
-                <YAxis stroke="#94a3b8" fontSize={11} />
-                <Tooltip formatter={(value) => formatCurrency(value, symbol)} />
-                <Legend />
-                <Bar dataKey="income" fill="#10B981" radius={[6, 6, 0, 0]} name="Income" />
-                <Bar dataKey="expense" fill="#F43F5E" radius={[6, 6, 0, 0]} name="Expense" />
-              </BarChart>
-            </ResponsiveContainer>
+          {/* Contextual Decision Explanation */}
+          <div className="p-4 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-100 dark:border-slate-800 space-y-3 text-xs">
+            <h4 className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-sky-600" /> Executive Insight
+            </h4>
+            {expenseCategories.length > 0 ? (
+              <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+                Your highest spending concentration is in <strong className="text-slate-900 dark:text-white">{expenseCategories[0].category}</strong> ({format(expenseCategories[0].total)}). Consider reviewing category budgets if this exceeds target thresholds.
+              </p>
+            ) : (
+              <p className="text-slate-400">No category expense records found for this month.</p>
+            )}
           </div>
         </div>
       </div>
 
-      {/* Category Breakdown Table */}
+      {/* Decision-Making Question 2: "How is my spending changing?" */}
       <div className="fin-card p-6 space-y-4">
-        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Expense Category Breakdown</h3>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-slate-50 dark:bg-slate-900/80 border-b border-slate-200/80 dark:border-slate-700/80 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                <th className="px-4 py-3">Category</th>
-                <th className="px-4 py-3 text-center">Transaction Count</th>
-                <th className="px-4 py-3 text-right">Total Spent</th>
-                <th className="px-4 py-3 text-right">% of Total Expenses</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-700/60 text-xs">
-              {expenseCategories.length === 0 ? (
-                <tr>
-                  <td colSpan={4} className="py-6 text-center text-slate-400">No expense categories logged for this month.</td>
-                </tr>
-              ) : (
-                expenseCategories.map(cat => {
-                  const pct = metrics.expenses > 0 ? Math.round((cat.total / metrics.expenses) * 100) : 0;
-                  return (
-                    <tr key={cat.category} className="hover:bg-slate-50/60 dark:hover:bg-slate-700/40 transition-colors">
-                      <td className="px-4 py-3 font-bold text-slate-900 dark:text-white">{cat.category}</td>
-                      <td className="px-4 py-3 text-center text-slate-500 font-medium">{cat.count} txns</td>
-                      <td className="px-4 py-3 text-right font-extrabold text-rose-600 dark:text-rose-400">{formatCurrency(cat.total, symbol)}</td>
-                      <td className="px-4 py-3 text-right font-semibold text-slate-700 dark:text-slate-300">{pct}%</td>
-                    </tr>
-                  );
-                })
-              )}
-            </tbody>
-          </table>
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 rounded-xl">
+              <TrendingDown className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
+                {t('analytics.howSpendingChanges')}
+              </h3>
+              <p className="text-xs text-slate-400">6-Month Cashflow Trajectory & Month-over-Month Shift</p>
+            </div>
+          </div>
+
+          <Badge variant={momComparison.expenseChangePct <= 0 ? 'success' : 'danger'}>
+            {momComparison.expenseChangePct > 0 ? (
+              <span className="flex items-center gap-1"><ArrowUpRight className="w-3.5 h-3.5" /> +{momComparison.expenseChangePct}% vs Last Month</span>
+            ) : (
+              <span className="flex items-center gap-1"><ArrowDownRight className="w-3.5 h-3.5" /> {momComparison.expenseChangePct}% vs Last Month</span>
+            )}
+          </Badge>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+          <div className="lg:col-span-2 h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={convertedMonthlyTrend}>
+                <XAxis dataKey="month_year" stroke="#94a3b8" fontSize={11} />
+                <YAxis stroke="#94a3b8" fontSize={11} />
+                <Tooltip formatter={(val) => formatRaw(val)} />
+                <Legend />
+                <Area type="monotone" dataKey="income" stroke="#10B981" fill="#10B98120" name="Income" />
+                <Area type="monotone" dataKey="expense" stroke="#F43F5E" fill="#F43F5E20" name="Expense" />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="p-4 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-100 dark:border-slate-800 space-y-3 text-xs">
+            <h4 className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-rose-500" /> Momentum Analysis
+            </h4>
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+              Expenses moved by <strong className="text-slate-900 dark:text-white">{momComparison.expenseChangePct}%</strong> compared to the previous cycle. Maintaining a steady gap between income and expenses is key for long-term wealth stability.
+            </p>
+          </div>
         </div>
       </div>
+
+      {/* Decision-Making Question 3: "Am I saving more?" */}
+      <div className="fin-card p-6 space-y-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 rounded-xl">
+              <TrendingUp className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
+                {t('analytics.amISavingMore')}
+              </h3>
+              <p className="text-xs text-slate-400">Net savings & monthly savings rate percentage</p>
+            </div>
+          </div>
+
+          <Badge variant="indigo">
+            Savings Rate: {metrics.savingsRate}%
+          </Badge>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
+          <div className="lg:col-span-2 h-72">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={incomeVsExpenseData}>
+                <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} />
+                <YAxis stroke="#94a3b8" fontSize={11} />
+                <Tooltip formatter={(val) => formatRaw(val)} />
+                <Legend />
+                <Bar dataKey="Income" fill="#10B981" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="Expenses" fill="#F43F5E" radius={[6, 6, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+
+          <div className="p-4 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-100 dark:border-slate-800 space-y-3 text-xs">
+            <h4 className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
+              <Sparkles className="w-4 h-4 text-emerald-500" /> Savings Guidance
+            </h4>
+            <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+              You retained <strong className="text-emerald-600 dark:text-emerald-400 font-bold">{format(metrics.savings)}</strong> ({metrics.savingsRate}%) of your total income this month. Financial planners recommend targeting a minimum 20% savings rate.
+            </p>
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 }

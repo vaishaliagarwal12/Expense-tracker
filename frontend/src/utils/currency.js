@@ -1,16 +1,26 @@
-export function formatCurrency(amount, symbol = '₹') {
-  if (amount === undefined || amount === null || isNaN(amount)) {
-    return `${symbol}0`;
-  }
-  const numeric = Number(amount);
-  const formatted = new Intl.NumberFormat('en-IN', {
-    maximumFractionDigits: 0
-  }).format(Math.abs(numeric));
+import {
+  convertCurrency,
+  formatCurrencyValue,
+  symbolToCode,
+  getCurrentRates
+} from '../services/currencyService';
 
-  return `${numeric < 0 ? '-' : ''}${symbol}${formatted}`;
+export function formatCurrency(amount, symbolOrCode, options = {}) {
+  const displayCode = symbolOrCode
+    ? symbolToCode(symbolOrCode)
+    : symbolToCode(localStorage.getItem('fintrack_display_currency') || 'INR');
+
+  const baseCode = symbolToCode(
+    options.fromCurrency || localStorage.getItem('fintrack_base_currency') || 'INR'
+  );
+
+  const rates = getCurrentRates();
+  const converted = convertCurrency(amount, baseCode, displayCode, rates);
+  return formatCurrencyValue(converted, displayCode, options);
 }
 
-export function formatNumber(amount) {
+export function formatNumber(amount, locale = 'en-US') {
   if (amount === undefined || amount === null || isNaN(amount)) return '0';
-  return new Intl.NumberFormat('en-IN').format(amount);
+  return new Intl.NumberFormat(locale).format(amount);
 }
+

@@ -1,107 +1,144 @@
-import React, { useState } from 'react';
-import { Sun, Moon, Plus, Calendar, ChevronDown, Menu, LogOut, User as UserIcon } from 'lucide-react';
-import { useTheme } from '../../context/ThemeContext';
+import React from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { getPastMonthsOptions } from '../../utils/date';
+import { useTheme } from '../../context/ThemeContext';
+import { useLanguage } from '../../context/LanguageContext';
+import { useCurrency } from '../../context/CurrencyContext';
+import { getMonthYearOptions } from '../../utils/date';
+import { 
+  Search, 
+  Plus, 
+  Sun, 
+  Moon, 
+  Monitor, 
+  Globe, 
+  Menu,
+  Calendar,
+  DollarSign
+} from 'lucide-react';
 
-export default function Header({ title, selectedMonth, onMonthChange, onOpenAddTransaction, onToggleMobileNav }) {
-  const { isDark, toggleTheme } = useTheme();
-  const { user, logout } = useAuth();
-  const [showUserMenu, setShowUserMenu] = useState(false);
-
-  const monthOptions = getPastMonthsOptions(12);
+export default function Header({
+  title,
+  selectedMonth,
+  onMonthChange,
+  onOpenAddTransaction,
+  onToggleMobileNav,
+  onOpenCommandPalette
+}) {
+  const { user } = useAuth();
+  const { themeMode, setThemeMode } = useTheme();
+  const { language, setLanguage, supportedLanguages, t } = useLanguage();
+  const { displayCurrency, setDisplayCurrency, displaySymbol, SUPPORTED_CURRENCIES } = useCurrency();
+  const monthOptions = getMonthYearOptions(12);
 
   return (
-    <header className="h-16 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-700/80 px-4 md:px-8 flex items-center justify-between sticky top-0 z-20 transition-colors">
+    <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-10 border-b border-slate-200/80 dark:border-slate-800 px-4 md:px-8 py-3 flex items-center justify-between gap-4 transition-colors">
+      {/* Left Title & Mobile Menu Trigger */}
       <div className="flex items-center gap-3">
-        {/* Mobile Menu Button */}
         <button
           onClick={onToggleMobileNav}
-          className="md:hidden p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+          className="md:hidden p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
         >
           <Menu className="w-5 h-5" />
         </button>
-
-        <h1 className="text-lg font-bold text-slate-900 dark:text-white tracking-tight hidden sm:block">
-          {title}
-        </h1>
+        <div>
+          <h1 className="text-base md:text-lg font-black text-slate-900 dark:text-white tracking-tight leading-none">
+            {title}
+          </h1>
+          <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 hidden sm:block">
+            FinTrack • {displayCurrency} ({displaySymbol}) Display Mode
+          </p>
+        </div>
       </div>
 
-      <div className="flex items-center gap-3">
-        {/* Month Selector Filter */}
-        {selectedMonth && onMonthChange && (
-          <div className="relative flex items-center bg-slate-100 dark:bg-slate-900/80 rounded-xl px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 border border-slate-200/90 dark:border-slate-700">
-            <Calendar className="w-3.5 h-3.5 mr-2 text-sky-600 dark:text-sky-400 shrink-0" />
-            <select
-              value={selectedMonth}
-              onChange={(e) => onMonthChange(e.target.value)}
-              className="bg-transparent border-none focus:outline-none focus:ring-0 cursor-pointer pr-3 text-xs font-semibold text-slate-900 dark:text-slate-100"
-            >
-              {monthOptions.map(opt => (
-                <option key={opt.value} value={opt.value} className="bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100">
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
 
-        {/* Quick Add Transaction Button */}
-        {onOpenAddTransaction && (
-          <button
-            onClick={onOpenAddTransaction}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-sky-600 hover:bg-sky-700 active:bg-sky-800 text-white font-semibold text-xs rounded-xl shadow-xs transition-all duration-150"
-          >
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">Add Transaction</span>
-          </button>
-        )}
-
-        {/* Theme Toggle Button */}
+      {/* Right Controls & Quick Actions */}
+      <div className="flex items-center gap-2 md:gap-3">
+        {/* Command Search Trigger */}
         <button
-          onClick={toggleTheme}
-          title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
-          className="p-2 rounded-xl text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+          onClick={onOpenCommandPalette}
+          className="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800/80 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 text-xs font-medium rounded-xl border border-slate-200/80 dark:border-slate-700 transition-colors"
         >
-          {isDark ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-600" />}
+          <Search className="w-3.5 h-3.5" />
+          <span>{t('nav.searchPlaceholder')}</span>
         </button>
 
-        {/* Profile Avatar Dropdown */}
-        <div className="relative">
-          <button
-            onClick={() => setShowUserMenu(!showUserMenu)}
-            className="flex items-center gap-2 p-1 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700/60 transition-colors"
+        {/* Month Selector */}
+        <div className="relative flex items-center">
+          <Calendar className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 pointer-events-none" />
+          <select
+            value={selectedMonth}
+            onChange={(e) => onMonthChange(e.target.value)}
+            className="pl-8 pr-2.5 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-semibold rounded-xl border border-slate-200/80 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
           >
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-sky-600 to-indigo-600 text-white font-bold text-xs flex items-center justify-center shadow-xs">
-              {user?.name ? user.name.charAt(0).toUpperCase() : 'U'}
-            </div>
-            <ChevronDown className="w-3.5 h-3.5 text-slate-400 hidden sm:block" />
-          </button>
-
-          {showUserMenu && (
-            <div 
-              className="absolute right-0 mt-2 w-52 bg-white dark:bg-slate-800 rounded-2xl shadow-popover border border-slate-200/90 dark:border-slate-700 py-1.5 z-50 animate-fade-in"
-              onClick={() => setShowUserMenu(false)}
-            >
-              <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-700/80">
-                <p className="text-xs font-bold text-slate-900 dark:text-white truncate">{user?.name}</p>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">{user?.email}</p>
-              </div>
-              <a
-                href="/profile"
-                className="flex items-center gap-2 px-4 py-2.5 text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 font-medium"
-              >
-                <UserIcon className="w-3.5 h-3.5 text-slate-400" /> Profile & Settings
-              </a>
-              <button
-                onClick={logout}
-                className="w-full flex items-center gap-2 px-4 py-2.5 text-xs text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30 font-semibold"
-              >
-                <LogOut className="w-3.5 h-3.5 text-rose-500" /> Sign out
-              </button>
-            </div>
-          )}
+            {monthOptions.map(m => (
+              <option key={m.value} value={m.value}>{m.label}</option>
+            ))}
+          </select>
         </div>
+
+        {/* Display Currency Selector */}
+        <div className="relative flex items-center">
+          <DollarSign className="w-3.5 h-3.5 text-emerald-500 absolute left-2.5 pointer-events-none" />
+          <select
+            value={displayCurrency}
+            onChange={(e) => setDisplayCurrency(e.target.value)}
+            className="pl-7 pr-2 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-bold rounded-xl border border-slate-200/80 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
+            title="Display Currency"
+          >
+            {SUPPORTED_CURRENCIES.map(c => (
+              <option key={c.code} value={c.code}>{c.code} ({c.symbol})</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Language Selector */}
+        <div className="relative flex items-center">
+          <Globe className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 pointer-events-none" />
+          <select
+            value={language}
+            onChange={(e) => setLanguage(e.target.value)}
+            className="pl-7 pr-2 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs font-semibold rounded-xl border border-slate-200/80 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-sky-500 cursor-pointer"
+          >
+            {supportedLanguages.map(l => (
+              <option key={l.code} value={l.code}>{l.nativeName}</option>
+            ))}
+          </select>
+        </div>
+
+
+        {/* Theme Toggle Dropdown */}
+        <div className="flex items-center bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200/80 dark:border-slate-700">
+          <button
+            onClick={() => setThemeMode('light')}
+            className={`p-1 rounded-lg text-xs transition-colors ${themeMode === 'light' ? 'bg-white dark:bg-slate-700 text-amber-500 shadow-xs' : 'text-slate-400 hover:text-slate-600'}`}
+            title={t('settings.themeLight')}
+          >
+            <Sun className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={() => setThemeMode('dark')}
+            className={`p-1 rounded-lg text-xs transition-colors ${themeMode === 'dark' ? 'bg-white dark:bg-slate-700 text-sky-400 shadow-xs' : 'text-slate-400 hover:text-slate-600'}`}
+            title={t('settings.themeDark')}
+          >
+            <Moon className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={() => setThemeMode('system')}
+            className={`p-1 rounded-lg text-xs transition-colors ${themeMode === 'system' ? 'bg-white dark:bg-slate-700 text-indigo-500 shadow-xs' : 'text-slate-400 hover:text-slate-600'}`}
+            title={t('settings.themeSystem')}
+          >
+            <Monitor className="w-3.5 h-3.5" />
+          </button>
+        </div>
+
+        {/* Quick Add Button */}
+        <button
+          onClick={onOpenAddTransaction}
+          className="flex items-center gap-1.5 px-3 py-1.5 bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold rounded-xl shadow-xs transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          <span className="hidden md:inline">{t('nav.quickAdd')}</span>
+        </button>
       </div>
     </header>
   );

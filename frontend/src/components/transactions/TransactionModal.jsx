@@ -3,11 +3,15 @@ import Modal from '../common/Modal';
 import { transactionApi } from '../../services/transactionApi';
 import { Upload, FileText, CheckCircle2, AlertCircle } from 'lucide-react';
 
+import { useCurrency } from '../../context/CurrencyContext';
+
 const INCOME_CATEGORIES = ['Salary', 'Freelancing', 'Scholarship', 'Business', 'Investment', 'Other Income'];
 const EXPENSE_CATEGORIES = ['Food', 'Transport', 'Shopping', 'Education', 'Entertainment', 'Bills', 'Healthcare', 'Travel', 'Rent', 'Other Expense'];
 const PAYMENT_METHODS = ['Cash', 'UPI', 'Debit Card', 'Credit Card', 'Bank Transfer', 'Wallet', 'Other'];
 
 export default function TransactionModal({ isOpen, onClose, transactionToEdit = null, onSuccess }) {
+  const { displayCurrency, displaySymbol, baseCurrency, convert } = useCurrency();
+
   const [formData, setFormData] = useState({
     type: 'expense',
     amount: '',
@@ -25,9 +29,11 @@ export default function TransactionModal({ isOpen, onClose, transactionToEdit = 
 
   useEffect(() => {
     if (transactionToEdit) {
+      // Convert stored base currency amount to active display currency for editing
+      const displayAmount = convert(transactionToEdit.amount, baseCurrency, displayCurrency);
       setFormData({
         type: transactionToEdit.type || 'expense',
-        amount: transactionToEdit.amount || '',
+        amount: displayAmount ? String(Math.round(displayAmount * 100) / 100) : '',
         category: transactionToEdit.category || (transactionToEdit.type === 'income' ? 'Salary' : 'Food'),
         description: transactionToEdit.description || '',
         date: transactionToEdit.date ? transactionToEdit.date.split('T')[0] : new Date().toISOString().split('T')[0],
@@ -47,7 +53,8 @@ export default function TransactionModal({ isOpen, onClose, transactionToEdit = 
         receipt_url: ''
       });
     }
-  }, [transactionToEdit, isOpen]);
+  }, [transactionToEdit, isOpen, displayCurrency, baseCurrency, convert]);
+
 
   const handleTypeChange = (newType) => {
     const defaultCat = newType === 'income' ? 'Salary' : 'Food';
@@ -89,7 +96,10 @@ export default function TransactionModal({ isOpen, onClose, transactionToEdit = 
     try {
       setLoading(true);
       setError('');
-      const payload = { ...formData, amount: Number(formData.amount) };
+      // Convert amount entered in display currency back to user's base account currency for database storage
+      const inputAmount = Number(formData.amount);
+      const baseAmount = convert(inputAmount, displayCurrency, baseCurrency);
+      const payload = { ...formData, amount: baseAmount };
 
       if (transactionToEdit) {
         await transactionApi.update(transactionToEdit.id, payload);
@@ -149,7 +159,7 @@ export default function TransactionModal({ isOpen, onClose, transactionToEdit = 
         {/* Amount Input */}
         <div>
           <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
-            Amount (₹)
+            Amount ({displaySymbol})
           </label>
           <input
             type="number"
@@ -161,6 +171,7 @@ export default function TransactionModal({ isOpen, onClose, transactionToEdit = 
             className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm text-slate-900 dark:text-white font-semibold focus:ring-2 focus:ring-sky-500 focus:outline-none"
           />
         </div>
+
 
         {/* Category & Payment Method */}
         <div className="grid grid-cols-2 gap-3">
