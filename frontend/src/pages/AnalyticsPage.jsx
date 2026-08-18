@@ -3,7 +3,9 @@ import { useOutletContext } from 'react-router-dom';
 import { analyticsApi } from '../services/analyticsApi';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useCurrency } from '../context/CurrencyContext';
 import { ChartSkeleton } from '../components/ui/Skeleton';
+
 
 import EmptyState from '../components/ui/EmptyState';
 import Badge from '../components/ui/Badge';

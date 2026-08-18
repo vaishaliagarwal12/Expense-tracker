@@ -11,11 +11,11 @@ export default function ReceiptViewerModal({ isOpen, onClose, receiptUrl, descri
       title={`Receipt: ${description || 'Attachment'}`}
       maxWidth="max-w-2xl"
     >
-      <div className="flex flex-col items-center justify-center p-2 bg-slate-900/5 dark:bg-slate-900/40 rounded-xl border border-slate-200 dark:border-slate-700">
+      <div className="flex flex-col items-center justify-center p-3 bg-slate-900/5 dark:bg-slate-900/40 rounded-xl border border-slate-200 dark:border-slate-700 w-full">
         <img
           src={receiptUrl}
           alt="Transaction Receipt"
-          className="max-h-[60vh] object-contain rounded-lg shadow-md"
+          className="max-h-[50vh] object-contain rounded-lg shadow-md"
         />
         <a
           href={receiptUrl}
@@ -29,3 +29,4 @@ export default function ReceiptViewerModal({ isOpen, onClose, receiptUrl, descri
     </Modal>
   );
 }
+
