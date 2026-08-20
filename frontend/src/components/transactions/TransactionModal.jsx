@@ -180,22 +180,20 @@ export default function TransactionModal({ isOpen, onClose, transactionToEdit = 
           <button
             type="button"
             onClick={() => handleTypeChange('expense')}
-            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-              formData.type === 'expense'
+            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${formData.type === 'expense'
                 ? 'bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 shadow-xs'
                 : 'text-slate-600 dark:text-slate-400'
-            }`}
+              }`}
           >
             Expense
           </button>
           <button
             type="button"
             onClick={() => handleTypeChange('income')}
-            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${
-              formData.type === 'income'
+            className={`flex-1 py-2 text-xs font-bold rounded-lg transition-all cursor-pointer ${formData.type === 'income'
                 ? 'bg-white dark:bg-slate-800 text-emerald-600 dark:text-emerald-400 shadow-xs'
                 : 'text-slate-600 dark:text-slate-400'
-            }`}
+              }`}
           >
             Income
           </button>
@@ -224,15 +222,19 @@ export default function TransactionModal({ isOpen, onClose, transactionToEdit = 
             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
               Category
             </label>
-            <select
+            <input
+              list="transaction-category-options"
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+              placeholder="Type or select a category"
               className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-semibold text-slate-900 dark:text-white focus:ring-2 focus:ring-sky-500 focus:outline-none"
-            >
+              required
+            />
+            <datalist id="transaction-category-options">
               {categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
+                <option key={cat} value={cat} />
               ))}
-            </select>
+            </datalist>
           </div>
 
           <div>
@@ -318,5 +320,4 @@ export default function TransactionModal({ isOpen, onClose, transactionToEdit = 
     </Modal>
   );
 }
-
 

@@ -20,7 +20,7 @@ class AuthService {
     const user = await userRepository.create({ name, email, password_hash, currency_symbol });
 
     // Seed sample financial data for new user so dashboard is immediately rich & realistic
-    await this.seedSampleData(user.id);
+    //await this.seedSampleData(user.id);
 
     // Send welcome email safely (failures logged, won't interrupt registration)
     try {
