@@ -114,7 +114,7 @@ export default function GoalModal({ isOpen, onClose, goalToEdit = null, onSucces
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
             <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
               Target Amount (₹)

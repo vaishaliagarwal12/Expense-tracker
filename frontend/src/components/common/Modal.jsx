@@ -32,15 +32,15 @@ export default function Modal({
 
   const modalContent = (
     <div 
-      className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs transition-opacity"
+      className="fixed inset-0 z-[9999] flex items-center justify-center max-sm:items-end p-2 sm:p-4 bg-slate-900/60 backdrop-blur-xs transition-opacity"
       onClick={onClose}
     >
       <div 
-        className={`w-full ${maxWidth} max-h-[calc(100vh-32px)] sm:max-h-[calc(100vh-48px)] bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-200/90 dark:border-slate-700/90 overflow-hidden flex flex-col my-auto`}
+        className={`w-full ${maxWidth} max-h-[calc(100dvh-20px)] sm:max-h-[calc(100vh-48px)] bg-white dark:bg-slate-800 rounded-2xl max-sm:rounded-b-none max-sm:rounded-t-3xl shadow-2xl border border-slate-200/90 dark:border-slate-700/90 overflow-hidden flex flex-col my-auto max-sm:my-0 animate-slide-up`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Fixed Header */}
-        <div className="flex items-center justify-between px-5 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 dark:border-slate-700/80 shrink-0 bg-white dark:bg-slate-800 z-10">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-100 dark:border-slate-700/80 shrink-0 bg-white dark:bg-slate-800 z-10">
           <h3 className="text-base font-bold text-slate-900 dark:text-white tracking-tight">
             {title}
           </h3>
@@ -56,13 +56,13 @@ export default function Modal({
         {/* Form / Content Wrapper */}
         <ContentWrapper {...wrapperProps} className="flex flex-col flex-1 min-h-0 overflow-hidden">
           {/* Scrollable Form Content Body */}
-          <div className="p-5 sm:p-6 overflow-y-auto flex-1 min-h-0 space-y-4 custom-scrollbar pb-6">
+          <div className="p-4 sm:p-6 overflow-y-auto flex-1 min-h-0 space-y-4 custom-scrollbar pb-6">
             {children}
           </div>
 
           {/* Fixed Footer Actions */}
           {footer && (
-            <div className="px-5 sm:px-6 py-3.5 bg-slate-50/95 dark:bg-slate-800/95 border-t border-slate-200/80 dark:border-slate-700 shrink-0 flex items-center justify-end gap-3 z-10">
+            <div className="px-4 sm:px-6 py-3.5 bg-slate-50/95 dark:bg-slate-800/95 border-t border-slate-200/80 dark:border-slate-700 shrink-0 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 z-10">
               {footer}
             </div>
           )}

@@ -15,13 +15,13 @@ export default function ReceiptViewerModal({ isOpen, onClose, receiptUrl, descri
         <img
           src={receiptUrl}
           alt="Transaction Receipt"
-          className="max-h-[50vh] object-contain rounded-lg shadow-md"
+          className="max-h-[50vh] sm:max-h-[60vh] max-w-full object-contain rounded-lg shadow-md"
         />
         <a
           href={receiptUrl}
           target="_blank"
           rel="noreferrer"
-          className="mt-4 px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold rounded-xl shadow-xs transition-colors"
+          className="mt-4 px-4 py-2 bg-sky-600 hover:bg-sky-700 text-white text-xs font-semibold rounded-xl shadow-xs transition-colors text-center w-full sm:w-auto"
         >
           Open Full Original Image
         </a>

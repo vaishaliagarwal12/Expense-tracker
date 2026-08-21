@@ -49,7 +49,7 @@ export default function Layout() {
       <MobileNav isOpen={mobileNavOpen} onClose={() => setMobileNavOpen(false)} />
 
       {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0 pb-16 md:pb-0">
+      <div className="flex-1 flex flex-col min-w-0 pb-24 md:pb-8">
         <Header 
           title={getPageTitle(location.pathname)}
           selectedMonth={selectedMonth}
@@ -59,7 +59,7 @@ export default function Layout() {
           onOpenCommandPalette={() => setCommandPaletteOpen(true)}
         />
 
-        <main className="flex-1 p-4 md:p-8 max-w-7xl w-full mx-auto animate-fade-in">
+        <main className="flex-1 p-3 sm:p-5 md:p-8 max-w-7xl w-full mx-auto animate-fade-in min-w-0">
           <Outlet context={{ selectedMonth, setSelectedMonth }} />
         </main>
       </div>

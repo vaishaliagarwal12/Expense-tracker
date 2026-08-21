@@ -58,9 +58,9 @@ export default function ProfilePage() {
         <p className="text-xs text-slate-500 dark:text-slate-400">{t('settings.subtitle')}</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
         {/* Profile Details Card */}
-        <div className="fin-card p-6 space-y-4">
+        <div className="fin-card p-4 sm:p-6 space-y-4">
           <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
             <User className="w-4 h-4 text-sky-600" />
             <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
@@ -87,7 +87,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Appearance & Theme Card */}
-        <div className="fin-card p-6 space-y-4">
+        <div className="fin-card p-4 sm:p-6 space-y-4">
           <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
             <Sun className="w-4 h-4 text-amber-500" />
             <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
@@ -95,50 +95,50 @@ export default function ProfilePage() {
             </h3>
           </div>
 
-          <div className="grid grid-cols-3 gap-3">
+          <div className="grid grid-cols-3 gap-2 sm:gap-3">
             <button
               type="button"
               onClick={() => setThemeMode('light')}
-              className={`p-4 rounded-2xl border text-center transition-all ${
+              className={`p-3 sm:p-4 rounded-2xl border text-center transition-all ${
                 themeMode === 'light'
                   ? 'border-sky-500 bg-sky-50/60 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 font-bold ring-2 ring-sky-500/20'
                   : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
             >
-              <Sun className="w-5 h-5 mx-auto mb-2 text-amber-500" />
-              <span className="text-xs block">{t('settings.themeLight')}</span>
+              <Sun className="w-4 h-4 sm:w-5 sm:h-5 mx-auto mb-1.5 sm:mb-2 text-amber-500" />
+              <span className="text-[11px] sm:text-xs block">{t('settings.themeLight')}</span>
             </button>
 
             <button
               type="button"
               onClick={() => setThemeMode('dark')}
-              className={`p-4 rounded-2xl border text-center transition-all ${
+              className={`p-3 sm:p-4 rounded-2xl border text-center transition-all ${
                 themeMode === 'dark'
                   ? 'border-sky-500 bg-sky-50/60 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 font-bold ring-2 ring-sky-500/20'
                   : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
             >
-              <Moon className="w-5 h-5 mx-auto mb-2 text-sky-400" />
-              <span className="text-xs block">{t('settings.themeDark')}</span>
+              <Moon className="w-4 h-4 sm:w-5 sm:h-5 mx-auto mb-1.5 sm:mb-2 text-sky-400" />
+              <span className="text-[11px] sm:text-xs block">{t('settings.themeDark')}</span>
             </button>
 
             <button
               type="button"
               onClick={() => setThemeMode('system')}
-              className={`p-4 rounded-2xl border text-center transition-all ${
+              className={`p-3 sm:p-4 rounded-2xl border text-center transition-all ${
                 themeMode === 'system'
                   ? 'border-sky-500 bg-sky-50/60 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 font-bold ring-2 ring-sky-500/20'
                   : 'border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800'
               }`}
             >
-              <Monitor className="w-5 h-5 mx-auto mb-2 text-indigo-500" />
-              <span className="text-xs block">{t('settings.themeSystem')}</span>
+              <Monitor className="w-4 h-4 sm:w-5 sm:h-5 mx-auto mb-1.5 sm:mb-2 text-indigo-500" />
+              <span className="text-[11px] sm:text-xs block">{t('settings.themeSystem')}</span>
             </button>
           </div>
         </div>
 
         {/* Internationalization & Currency Card */}
-        <div className="fin-card p-6 space-y-4">
+        <div className="fin-card p-4 sm:p-6 space-y-4">
           <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
             <Globe className="w-4 h-4 text-emerald-500" />
             <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
@@ -171,7 +171,7 @@ export default function ProfilePage() {
 
         {/* Submit Button */}
         <div className="flex justify-end">
-          <Button type="submit" variant="primary" loading={loading} icon={CheckCircle2}>
+          <Button type="submit" variant="primary" loading={loading} icon={CheckCircle2} className="w-full sm:w-auto">
             {t('settings.saveChanges')}
           </Button>
         </div>

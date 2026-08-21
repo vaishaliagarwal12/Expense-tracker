@@ -77,8 +77,8 @@ export default function LoginPage() {
       </div>
 
       {/* Right Login Form Container */}
-      <div className="flex-1 flex items-center justify-center p-6 bg-slate-50 dark:bg-slate-900">
-        <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-200/90 dark:border-slate-700 p-8 space-y-6">
+      <div className="flex-1 flex items-center justify-center p-4 sm:p-6 bg-slate-50 dark:bg-slate-900">
+        <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-3xl shadow-xl border border-slate-200/90 dark:border-slate-700 p-5 sm:p-8 space-y-6">
           <div className="space-y-2">
             <div className="lg:hidden flex items-center gap-2 mb-4">
               <div className="p-2 bg-sky-600 rounded-xl text-white">

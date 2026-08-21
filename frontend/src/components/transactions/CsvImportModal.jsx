@@ -96,7 +96,7 @@ export default function CsvImportModal({ isOpen, onClose, onSuccess }) {
           </div>
         )}
 
-        <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 p-3 bg-slate-50 dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
           <div>
             <span className="font-semibold text-slate-800 dark:text-slate-200 block">Need a template?</span>
             <span className="text-slate-500 dark:text-slate-400">Download formatted CSV sample file</span>
@@ -104,7 +104,7 @@ export default function CsvImportModal({ isOpen, onClose, onSuccess }) {
           <button
             type="button"
             onClick={handleDownloadSample}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-100 font-semibold rounded-lg transition-colors cursor-pointer"
+            className="flex items-center justify-center gap-1.5 px-3 py-1.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-100 font-semibold rounded-lg transition-colors cursor-pointer w-full sm:w-auto"
           >
             <Download className="w-3.5 h-3.5" /> Sample CSV
           </button>

@@ -96,17 +96,17 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Decision-Making Question 1: "Where did my money go?" */}
-      <div className="fin-card p-6 space-y-4">
+      <div className="fin-card p-4 sm:p-6 space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 rounded-xl">
+            <div className="p-2 bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 rounded-xl shrink-0">
               <PieIcon className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
+              <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
                 {t('analytics.whereMoneyWent')}
               </h3>
-              <p className="text-xs text-slate-400">Expense category allocation breakdown</p>
+              <p className="text-[11px] sm:text-xs text-slate-400">Expense category allocation breakdown</p>
             </div>
           </div>
 
@@ -115,8 +115,8 @@ export default function AnalyticsPage() {
           </Badge>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-          <div className="lg:col-span-2 h-72">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 items-center">
+          <div className="lg:col-span-2 h-56 sm:h-72">
             {pieChartData.length === 0 ? (
               <EmptyState title="No Expenses Recorded" description="Log expense entries to analyze category distribution." />
             ) : (
@@ -126,8 +126,8 @@ export default function AnalyticsPage() {
                     data={pieChartData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={60}
-                    outerRadius={90}
+                    innerRadius={45}
+                    outerRadius={75}
                     paddingAngle={4}
                     dataKey="value"
                   >
@@ -143,7 +143,7 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Contextual Decision Explanation */}
-          <div className="p-4 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-100 dark:border-slate-800 space-y-3 text-xs">
+          <div className="p-3.5 sm:p-4 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-100 dark:border-slate-800 space-y-3 text-xs">
             <h4 className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-sky-600" /> Executive Insight
             </h4>
@@ -159,17 +159,17 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Decision-Making Question 2: "How is my spending changing?" */}
-      <div className="fin-card p-6 space-y-4">
+      <div className="fin-card p-4 sm:p-6 space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 rounded-xl">
+            <div className="p-2 bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 rounded-xl shrink-0">
               <TrendingDown className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
+              <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
                 {t('analytics.howSpendingChanges')}
               </h3>
-              <p className="text-xs text-slate-400">6-Month Cashflow Trajectory & Month-over-Month Shift</p>
+              <p className="text-[11px] sm:text-xs text-slate-400">6-Month Cashflow Trajectory & Month-over-Month Shift</p>
             </div>
           </div>
 
@@ -182,8 +182,8 @@ export default function AnalyticsPage() {
           </Badge>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-          <div className="lg:col-span-2 h-72">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 items-center">
+          <div className="lg:col-span-2 h-56 sm:h-72">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={convertedMonthlyTrend}>
                 <XAxis dataKey="month_year" stroke="#94a3b8" fontSize={11} />
@@ -196,7 +196,7 @@ export default function AnalyticsPage() {
             </ResponsiveContainer>
           </div>
 
-          <div className="p-4 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-100 dark:border-slate-800 space-y-3 text-xs">
+          <div className="p-3.5 sm:p-4 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-100 dark:border-slate-800 space-y-3 text-xs">
             <h4 className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-rose-500" /> Momentum Analysis
             </h4>
@@ -208,17 +208,17 @@ export default function AnalyticsPage() {
       </div>
 
       {/* Decision-Making Question 3: "Am I saving more?" */}
-      <div className="fin-card p-6 space-y-4">
+      <div className="fin-card p-4 sm:p-6 space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
           <div className="flex items-center gap-2">
-            <div className="p-2 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 rounded-xl">
+            <div className="p-2 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 rounded-xl shrink-0">
               <TrendingUp className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
+              <h3 className="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
                 {t('analytics.amISavingMore')}
               </h3>
-              <p className="text-xs text-slate-400">Net savings & monthly savings rate percentage</p>
+              <p className="text-[11px] sm:text-xs text-slate-400">Net savings & monthly savings rate percentage</p>
             </div>
           </div>
 
@@ -227,8 +227,8 @@ export default function AnalyticsPage() {
           </Badge>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-          <div className="lg:col-span-2 h-72">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 items-center">
+          <div className="lg:col-span-2 h-56 sm:h-72">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={incomeVsExpenseData}>
                 <XAxis dataKey="name" stroke="#94a3b8" fontSize={11} />
@@ -241,7 +241,7 @@ export default function AnalyticsPage() {
             </ResponsiveContainer>
           </div>
 
-          <div className="p-4 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-100 dark:border-slate-800 space-y-3 text-xs">
+          <div className="p-3.5 sm:p-4 bg-slate-50 dark:bg-slate-900/60 rounded-2xl border border-slate-100 dark:border-slate-800 space-y-3 text-xs">
             <h4 className="font-extrabold text-slate-900 dark:text-white flex items-center gap-1.5">
               <Sparkles className="w-4 h-4 text-emerald-500" /> Savings Guidance
             </h4>

@@ -59,7 +59,7 @@ export default function GoalsPage() {
   return (
     <div className="space-y-6 animate-fade-in pb-12">
       {/* Header Action Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-4">
         <div>
           <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">{t('goals.title')}</h2>
           <p className="text-xs text-slate-500 dark:text-slate-400">{t('goals.subtitle')}</p>
@@ -70,6 +70,7 @@ export default function GoalsPage() {
           size="sm"
           icon={Plus}
           onClick={() => { setEditingGoal(null); setIsGoalModalOpen(true); }}
+          className="w-full sm:w-auto"
         >
           {t('goals.create')}
         </Button>
@@ -77,7 +78,7 @@ export default function GoalsPage() {
 
       {/* Goals Cards Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           <CardSkeleton className="h-52" />
           <CardSkeleton className="h-52" />
           <CardSkeleton className="h-52" />
@@ -92,25 +93,25 @@ export default function GoalsPage() {
           className="py-16"
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {goals.map(g => (
-            <div key={g.id} className="fin-card fin-card-hover p-6 flex flex-col justify-between space-y-4">
+            <div key={g.id} className="fin-card fin-card-hover p-4 sm:p-6 flex flex-col justify-between space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-2.5 bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 rounded-xl">
+                  <div className="p-2.5 bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 rounded-xl shrink-0">
                     <Target className="w-5 h-5" />
                   </div>
-                  <div>
-                    <h3 className="text-base font-extrabold text-slate-900 dark:text-white">{g.name}</h3>
+                  <div className="min-w-0">
+                    <h3 className="text-base font-extrabold text-slate-900 dark:text-white truncate">{g.name}</h3>
                     {g.target_date && (
                       <p className="text-[11px] text-slate-400 font-medium flex items-center gap-1">
-                        <Calendar className="w-3 h-3" /> {formatDate(g.target_date)}
+                        <Calendar className="w-3 h-3 shrink-0" /> {formatDate(g.target_date)}
                       </p>
                     )}
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 shrink-0">
                   <button
                     onClick={() => { setEditingGoal(g); setIsGoalModalOpen(true); }}
                     className="p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
@@ -136,14 +137,14 @@ export default function GoalsPage() {
               </div>
 
               {/* Metrics Breakdown */}
-              <div className="grid grid-cols-2 text-xs pt-3 border-t border-slate-100 dark:border-slate-800">
+              <div className="grid grid-cols-2 text-xs pt-3 border-t border-slate-100 dark:border-slate-800 gap-1">
                 <div>
                   <span className="text-slate-400 block text-[11px]">{t('goals.saved')}</span>
-                  <span className="font-extrabold text-emerald-600 dark:text-emerald-400">{format(g.current_saved)}</span>
+                  <span className="font-extrabold text-emerald-600 dark:text-emerald-400 truncate block">{format(g.current_saved)}</span>
                 </div>
                 <div className="text-right">
                   <span className="text-slate-400 block text-[11px]">{t('goals.target')}</span>
-                  <span className="font-extrabold text-slate-900 dark:text-white">{format(g.target_amount)}</span>
+                  <span className="font-extrabold text-slate-900 dark:text-white truncate block">{format(g.target_amount)}</span>
                 </div>
 
               </div>

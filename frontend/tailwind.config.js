@@ -7,6 +7,9 @@ export default {
   darkMode: 'class',
   theme: {
     extend: {
+      screens: {
+        'xs': '380px',
+      },
       colors: {
         fin: {
           bg: '#F8FAFC',

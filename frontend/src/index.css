@@ -92,3 +92,18 @@
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
 }
+
+/* Safe Area Insets for Mobile Devices */
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom, 1rem);
+}
+
+.pt-safe {
+  padding-top: env(safe-area-inset-top, 1rem);
+}
+
+/* Responsive Touch Scrolling Utilities */
+.custom-scrollbar {
+  -webkit-overflow-scrolling: touch;
+}
+

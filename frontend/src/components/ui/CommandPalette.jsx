@@ -71,7 +71,7 @@ export default function CommandPalette({ isOpen, onClose, onOpenAddTransaction }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 md:pt-24 p-4">
+    <div className="fixed inset-0 z-50 flex items-start justify-center pt-4 sm:pt-16 md:pt-24 p-3 sm:p-4">
       {/* Backdrop */}
       <div 
         className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity animate-fade-in"

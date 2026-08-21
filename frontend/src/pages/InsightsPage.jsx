@@ -55,13 +55,13 @@ export default function InsightsPage() {
       ) : (
         <div className="space-y-4">
           {insights.map((item, idx) => (
-            <div key={idx} className="fin-card p-6 space-y-4 border-l-4 border-l-sky-500 dark:border-l-sky-400">
+            <div key={idx} className="fin-card p-4 sm:p-6 space-y-4 border-l-4 border-l-sky-500 dark:border-l-sky-400">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2 bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 rounded-xl">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="p-2 bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 rounded-xl shrink-0">
                     <Sparkles className="w-4 h-4" />
                   </div>
-                  <h3 className="text-base font-extrabold text-slate-900 dark:text-white">{item.title || 'Insight Alert'}</h3>
+                  <h3 className="text-sm sm:text-base font-extrabold text-slate-900 dark:text-white truncate">{item.title || 'Insight Alert'}</h3>
                 </div>
 
                 <Badge variant={item.severity === 'high' ? 'danger' : item.severity === 'medium' ? 'warning' : 'info'}>
@@ -70,9 +70,9 @@ export default function InsightsPage() {
               </div>
 
               {/* WHAT / WHY / WHAT TO DO STRUCTURE */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2 text-xs">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 sm:gap-4 pt-2 text-xs">
                 {/* WHAT HAPPENED */}
-                <div className="p-3.5 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-100 dark:border-slate-800 space-y-1">
+                <div className="p-3 sm:p-3.5 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-100 dark:border-slate-800 space-y-1">
                   <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 block">{t('insights.whatHappened')}</span>
                   <p className="text-slate-800 dark:text-slate-200 font-medium leading-relaxed">
                     {item.whatHappened || item.description || item.message}
@@ -80,7 +80,7 @@ export default function InsightsPage() {
                 </div>
 
                 {/* WHY IT MATTERS */}
-                <div className="p-3.5 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-100 dark:border-slate-800 space-y-1">
+                <div className="p-3 sm:p-3.5 bg-slate-50 dark:bg-slate-900/60 rounded-xl border border-slate-100 dark:border-slate-800 space-y-1">
                   <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-500 block flex items-center gap-1">
                     <AlertTriangle className="w-3 h-3" /> {t('insights.whyItMatters')}
                   </span>
@@ -90,7 +90,7 @@ export default function InsightsPage() {
                 </div>
 
                 {/* WHAT YOU CAN DO */}
-                <div className="p-3.5 bg-sky-50/60 dark:bg-sky-950/30 rounded-xl border border-sky-100 dark:border-sky-800/60 space-y-1">
+                <div className="p-3 sm:p-3.5 bg-sky-50/60 dark:bg-sky-950/30 rounded-xl border border-sky-100 dark:border-sky-800/60 space-y-1">
                   <span className="text-[10px] font-extrabold uppercase tracking-wider text-sky-600 dark:text-sky-400 block flex items-center gap-1">
                     <Lightbulb className="w-3 h-3" /> {t('insights.whatYouCanDo')}
                   </span>

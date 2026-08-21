@@ -27,7 +27,7 @@ export function Modal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center max-sm:items-end p-2 sm:p-4 overflow-y-auto">
       {/* Backdrop */}
       <div
         className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity animate-fade-in"
@@ -35,9 +35,9 @@ export function Modal({
       />
 
       {/* Modal Box */}
-      <div className={`relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl w-full ${maxWidth} overflow-hidden z-10 animate-slide-up ${className}`}>
+      <div className={`relative bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl max-sm:rounded-b-none max-sm:rounded-t-3xl shadow-2xl w-full ${maxWidth} overflow-hidden z-10 animate-slide-up ${className}`}>
         {/* Modal Header */}
-        <div className="flex items-center justify-between p-5 md:p-6 border-b border-slate-100 dark:border-slate-800">
+        <div className="flex items-center justify-between p-4 sm:p-5 md:p-6 border-b border-slate-100 dark:border-slate-800">
           <div>
             {title && <h3 className="text-base font-extrabold text-slate-900 dark:text-white tracking-tight">{title}</h3>}
             {subtitle && <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{subtitle}</p>}
@@ -51,7 +51,7 @@ export function Modal({
         </div>
 
         {/* Modal Body */}
-        <div className="p-5 md:p-6 max-h-[calc(100vh-12rem)] overflow-y-auto">
+        <div className="p-4 sm:p-5 md:p-6 max-h-[calc(100dvh-8rem)] overflow-y-auto">
           {children}
         </div>
       </div>
@@ -92,8 +92,8 @@ export function Drawer({
       />
 
       <div className={`fixed inset-y-0 ${position === 'right' ? 'right-0' : 'left-0'} flex max-w-full z-10`}>
-        <div className={`w-screen ${maxWidth} bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col animate-slide-up`}>
-          <div className="flex items-center justify-between p-5 border-b border-slate-100 dark:border-slate-800">
+        <div className={`w-[85vw] ${maxWidth} bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl flex flex-col animate-slide-up`}>
+          <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800">
             <div>
               {title && <h3 className="text-base font-extrabold text-slate-900 dark:text-white">{title}</h3>}
               {subtitle && <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{subtitle}</p>}
@@ -105,7 +105,7 @@ export function Drawer({
               <X className="w-4 h-4" />
             </button>
           </div>
-          <div className="flex-1 p-5 overflow-y-auto">
+          <div className="flex-1 p-4 sm:p-5 overflow-y-auto">
             {children}
           </div>
         </div>

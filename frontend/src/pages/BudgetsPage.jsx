@@ -59,7 +59,7 @@ export default function BudgetsPage() {
   return (
     <div className="space-y-6 animate-fade-in pb-12">
       {/* Header Action Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-4">
         <div>
           <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">{t('budgets.title')}</h2>
           <p className="text-xs text-slate-500 dark:text-slate-400">{t('budgets.subtitle')} ({selectedMonth})</p>
@@ -70,42 +70,43 @@ export default function BudgetsPage() {
           size="sm"
           icon={Plus}
           onClick={() => { setEditingBudget(null); setIsModalOpen(true); }}
+          className="w-full sm:w-auto"
         >
           {t('budgets.create')}
         </Button>
       </div>
 
       {/* Summary KPI Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="fin-card p-5 space-y-2">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+        <div className="fin-card p-4 sm:p-5 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('budgets.totalBudget')}</span>
             <div className="p-2 bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 rounded-xl">
               <Wallet className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-black text-slate-900 dark:text-white">{format(summary.totalBudget)}</p>
+          <p className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">{format(summary.totalBudget)}</p>
         </div>
 
-        <div className="fin-card p-5 space-y-2">
+        <div className="fin-card p-4 sm:p-5 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('budgets.spentSoFar')}</span>
             <div className="p-2 bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 rounded-xl">
               <CreditCard className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-black text-slate-900 dark:text-white">{format(summary.totalSpent)}</p>
+          <p className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">{format(summary.totalSpent)}</p>
           <p className="text-[11px] text-slate-400 font-medium">Usage: {summary.overallUsagePercentage}%</p>
         </div>
 
-        <div className="fin-card p-5 space-y-2">
+        <div className="fin-card p-4 sm:p-5 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('budgets.remaining')}</span>
             <div className="p-2 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 rounded-xl">
               <ShieldCheck className="w-4 h-4" />
             </div>
           </div>
-          <p className={`text-2xl font-black ${summary.totalRemaining >= 0 ? 'text-slate-900 dark:text-white' : 'text-rose-600 dark:text-rose-400'}`}>
+          <p className={`text-xl sm:text-2xl font-black ${summary.totalRemaining >= 0 ? 'text-slate-900 dark:text-white' : 'text-rose-600 dark:text-rose-400'}`}>
             {format(summary.totalRemaining)}
           </p>
         </div>
@@ -127,12 +128,12 @@ export default function BudgetsPage() {
           className="py-16"
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
           {budgets.map(b => (
-            <div key={b.id} className="fin-card fin-card-hover p-5 flex flex-col justify-between space-y-4">
+            <div key={b.id} className="fin-card fin-card-hover p-4 sm:p-5 flex flex-col justify-between space-y-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <h3 className="text-base font-extrabold text-slate-900 dark:text-white">{b.category}</h3>
                     <Badge variant={b.isExceeded ? 'danger' : b.isWarning ? 'warning' : 'success'}>
                       {b.isExceeded ? t('budgets.overBudget') : b.isWarning ? t('budgets.caution') : t('budgets.safe')}
@@ -140,7 +141,7 @@ export default function BudgetsPage() {
                   </div>
                   <p className="text-[11px] text-slate-400 font-medium">Month: {b.month_year}</p>
                 </div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 shrink-0">
                   <button
                     onClick={() => { setEditingBudget(b); setIsModalOpen(true); }}
                     className="p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
@@ -177,18 +178,18 @@ export default function BudgetsPage() {
               <div className="space-y-2">
                 <ProgressBar value={b.spent} max={b.amount} status={b.status} showText={false} height="h-2.5" />
                 
-                <div className="grid grid-cols-3 text-xs pt-1 border-t border-slate-100 dark:border-slate-800">
+                <div className="grid grid-cols-3 gap-1 text-[11px] sm:text-xs pt-1 border-t border-slate-100 dark:border-slate-800">
                   <div>
-                    <span className="text-slate-400 block text-[11px]">{t('budgets.totalBudget')}</span>
-                    <span className="font-bold text-slate-900 dark:text-white">{format(b.amount)}</span>
+                    <span className="text-slate-400 block text-[10px] sm:text-[11px]">{t('budgets.totalBudget')}</span>
+                    <span className="font-bold text-slate-900 dark:text-white truncate block">{format(b.amount)}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[11px]">{t('budgets.spentSoFar')}</span>
-                    <span className="font-bold text-rose-600 dark:text-rose-400">{format(b.spent)}</span>
+                    <span className="text-slate-400 block text-[10px] sm:text-[11px]">{t('budgets.spentSoFar')}</span>
+                    <span className="font-bold text-rose-600 dark:text-rose-400 truncate block">{format(b.spent)}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[11px]">{t('budgets.remaining')}</span>
-                    <span className={`font-bold ${b.remaining >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
+                    <span className="text-slate-400 block text-[10px] sm:text-[11px]">{t('budgets.remaining')}</span>
+                    <span className={`font-bold truncate block ${b.remaining >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                       {format(b.remaining)}
                     </span>
                   </div>

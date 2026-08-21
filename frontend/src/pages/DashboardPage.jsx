@@ -202,10 +202,10 @@ export default function DashboardPage() {
       </div>
 
       {/* CORE UX CONCEPT: FINANCIAL PULSE HERO BANNER */}
-      <div className="fin-card p-6 bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 text-white dark:border-slate-800 relative overflow-hidden shadow-xl">
+      <div className="fin-card p-4 sm:p-6 bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 text-white dark:border-slate-800 relative overflow-hidden shadow-xl">
         <div className="absolute right-0 top-0 w-96 h-96 bg-sky-500/10 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 space-y-6">
+        <div className="relative z-10 space-y-4 sm:space-y-6">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-extrabold uppercase tracking-widest text-sky-400 flex items-center gap-2">
               <Flame className="w-4 h-4 text-sky-400 animate-pulse-subtle" />
@@ -216,17 +216,17 @@ export default function DashboardPage() {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 items-end">
             <div>
               <span className="text-xs font-semibold text-slate-400 block">{t('pulse.netPosition')}</span>
-              <p className="text-3xl md:text-4xl font-black tracking-tight text-white mt-1">
+              <p className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-white mt-1">
                 {format(netBalance)}
               </p>
             </div>
 
             <div>
               <span className="text-xs font-semibold text-slate-400 block">{t('pulse.spendingPace')}</span>
-              <p className={`text-base font-bold mt-1 flex items-center gap-1 ${
+              <p className={`text-sm sm:text-base font-bold mt-1 flex items-center gap-1 ${
                 momComparison.expenseChangePct > 0 ? 'text-rose-400' : 'text-emerald-400'
               }`}>
                 {momComparison.expenseChangePct > 0 ? (
@@ -245,13 +245,12 @@ export default function DashboardPage() {
 
             <div>
               <span className="text-xs font-semibold text-slate-400 block">{t('metrics.savingsRate')}</span>
-              <p className="text-base font-bold text-sky-300 mt-1">
+              <p className="text-sm sm:text-base font-bold text-sky-300 mt-1">
                 {metrics.savingsRate}% ({format(metrics.savings)})
               </p>
             </div>
 
-
-            <div className="flex justify-start md:justify-end">
+            <div className="flex justify-start sm:justify-end">
               <Link to="/transactions">
                 <Button variant="primary" size="sm" icon={ArrowRight}>
                   {t('nav.transactions')}
@@ -263,8 +262,8 @@ export default function DashboardPage() {
       </div>
 
       {/* DYNAMIC NARRATIVE SECTION: "WHAT'S HAPPENING" (WHAT / WHY / SO WHAT / WHAT NEXT) */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 fin-card p-6 space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="lg:col-span-2 fin-card p-4 sm:p-6 space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
             <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-sky-600 dark:text-sky-400" />
@@ -278,7 +277,7 @@ export default function DashboardPage() {
               <p className="text-xs text-slate-400 py-4">Your cashflow and budget activity is steady with no unusual spikes.</p>
             ) : (
               narratives.map((item, i) => (
-                <div key={i} className={`p-4 rounded-2xl border flex items-start gap-3 transition-colors ${
+                <div key={i} className={`p-3.5 sm:p-4 rounded-2xl border flex items-start gap-3 transition-colors ${
                   item.type === 'warning' || item.type === 'danger'
                     ? 'bg-rose-50/60 dark:bg-rose-950/30 border-rose-200/80 dark:border-rose-800/60 text-rose-900 dark:text-rose-200'
                     : 'bg-emerald-50/60 dark:bg-emerald-950/30 border-emerald-200/80 dark:border-emerald-800/60 text-emerald-900 dark:text-emerald-200'
@@ -288,8 +287,8 @@ export default function DashboardPage() {
                   ) : (
                     <CheckCircle2 className="w-5 h-5 text-emerald-500 shrink-0 mt-0.5" />
                   )}
-                  <div className="space-y-1 text-xs">
-                    <p className="font-extrabold text-sm">{item.text}</p>
+                  <div className="space-y-1 text-xs min-w-0">
+                    <p className="font-extrabold text-xs sm:text-sm">{item.text}</p>
                     <p className="text-slate-600 dark:text-slate-400 font-medium">
                       <strong className="uppercase text-[10px] text-slate-400 mr-1">{t('pulse.why')}</strong>
                       {item.reason}
@@ -303,7 +302,7 @@ export default function DashboardPage() {
 
         {/* FINANCIAL HEALTH SCORE CARD */}
         {healthScore && (
-          <div className="fin-card p-6 flex flex-col justify-between space-y-4">
+          <div className="fin-card p-4 sm:p-6 flex flex-col justify-between space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <span className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center gap-2">
                 <Activity className="w-4 h-4 text-sky-600" />
@@ -315,8 +314,8 @@ export default function DashboardPage() {
             </div>
 
             <div className="text-center my-2">
-              <div className="text-4xl font-black tracking-tight" style={{ color: healthScore.color }}>
-                {healthScore.score}<span className="text-xl font-normal text-slate-400">/100</span>
+              <div className="text-3xl sm:text-4xl font-black tracking-tight" style={{ color: healthScore.color }}>
+                {healthScore.score}<span className="text-lg sm:text-xl font-normal text-slate-400">/100</span>
               </div>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 line-clamp-2 px-2 leading-relaxed">
                 {healthScore.disclaimer}
@@ -336,52 +335,52 @@ export default function DashboardPage() {
       </div>
 
       {/* 4 PRIMARY METRIC CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="fin-card p-5 space-y-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div className="fin-card p-4 sm:p-5 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('metrics.totalBalance')}</span>
             <div className="p-2 bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 rounded-xl">
               <Wallet className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-black text-slate-900 dark:text-white">{format(netBalance)}</p>
+          <p className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">{format(netBalance)}</p>
           <p className="text-[11px] text-slate-400 font-medium">{t('metrics.netMonthlyCashflow')}</p>
         </div>
 
-        <div className="fin-card p-5 space-y-2">
+        <div className="fin-card p-4 sm:p-5 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('metrics.totalIncome')}</span>
             <div className="p-2 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 rounded-xl">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-black text-slate-900 dark:text-white">{format(metrics.income)}</p>
+          <p className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">{format(metrics.income)}</p>
           <p className="text-[11px] text-emerald-600 dark:text-emerald-400 font-bold">
             {t('metrics.vsLastMonth', { change: momComparison.incomeChangePct })}
           </p>
         </div>
 
-        <div className="fin-card p-5 space-y-2">
+        <div className="fin-card p-4 sm:p-5 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('metrics.totalExpenses')}</span>
             <div className="p-2 bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 rounded-xl">
               <TrendingDown className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-black text-slate-900 dark:text-white">{format(metrics.expenses)}</p>
+          <p className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">{format(metrics.expenses)}</p>
           <p className="text-[11px] text-rose-600 dark:text-rose-400 font-bold">
             {t('metrics.vsLastMonth', { change: momComparison.expenseChangePct })}
           </p>
         </div>
 
-        <div className="fin-card p-5 space-y-2">
+        <div className="fin-card p-4 sm:p-5 space-y-2">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('metrics.totalSavings')}</span>
             <div className="p-2 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 rounded-xl">
               <PiggyBank className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-black text-slate-900 dark:text-white">{format(metrics.savings)}</p>
+          <p className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white">{format(metrics.savings)}</p>
           <p className="text-[11px] text-indigo-600 dark:text-indigo-400 font-bold">
             {t('metrics.savingsRate')}: {metrics.savingsRate}%
           </p>
@@ -389,9 +388,9 @@ export default function DashboardPage() {
       </div>
 
       {/* CHARTS ROW: SPENDING TRAJECTORY & CATEGORY BREAKDOWN */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* SPENDING TRAJECTORY CHART */}
-        <div className="fin-card p-6 space-y-4">
+        <div className="fin-card p-4 sm:p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               {t('forecast.title')}
@@ -400,7 +399,7 @@ export default function DashboardPage() {
               <span className="text-xs font-semibold text-slate-400">{forecast.remainingDays} days left</span>
             )}
           </div>
-          <div className="h-64">
+          <div className="h-56 sm:h-64">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={trajectoryData}>
                 <XAxis dataKey="month" stroke="#94a3b8" fontSize={11} />
@@ -415,7 +414,7 @@ export default function DashboardPage() {
         </div>
 
         {/* TOP SPENDING CATEGORIES DONUT */}
-        <div className="fin-card p-6 space-y-4">
+        <div className="fin-card p-4 sm:p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               {t('analytics.categoryDistribution')}
@@ -424,7 +423,7 @@ export default function DashboardPage() {
               {t('common.viewAll')}
             </Link>
           </div>
-          <div className="h-64">
+          <div className="h-56 sm:h-64">
             {pieChartData.length === 0 ? (
               <div className="h-full flex items-center justify-center text-xs text-slate-400">No expense records for this month</div>
             ) : (
@@ -434,8 +433,8 @@ export default function DashboardPage() {
                     data={pieChartData}
                     cx="50%"
                     cy="50%"
-                    innerRadius={55}
-                    outerRadius={80}
+                    innerRadius={45}
+                    outerRadius={75}
                     paddingAngle={3}
                     dataKey="value"
                   >

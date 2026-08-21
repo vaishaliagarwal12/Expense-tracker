@@ -55,7 +55,7 @@ export default function RecurringPage() {
   return (
     <div className="space-y-6 animate-fade-in pb-12">
       {/* Header Action Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 border-b border-slate-200/80 dark:border-slate-800 pb-4">
         <div>
           <h2 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">{t('recurring.title')}</h2>
           <p className="text-xs text-slate-500 dark:text-slate-400">{t('recurring.subtitle')}</p>
@@ -66,17 +66,18 @@ export default function RecurringPage() {
           size="sm"
           icon={Plus}
           onClick={() => { setEditingItem(null); setIsModalOpen(true); }}
+          className="w-full sm:w-auto"
         >
           {t('recurring.create')}
         </Button>
       </div>
 
       {/* Info Banner */}
-      <div className="p-4 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800/60 rounded-2xl flex items-start gap-3 text-xs text-sky-900 dark:text-sky-200">
+      <div className="p-3.5 sm:p-4 bg-sky-50 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-800/60 rounded-2xl flex items-start gap-3 text-xs text-sky-900 dark:text-sky-200">
         <Clock className="w-4 h-4 text-sky-600 shrink-0 mt-0.5" />
         <div>
-          <p className="font-extrabold text-sm">Automatic Transaction Generation</p>
-          <p className="mt-0.5 text-sky-700 dark:text-sky-300">
+          <p className="font-extrabold text-xs sm:text-sm">Automatic Transaction Generation</p>
+          <p className="mt-0.5 text-sky-700 dark:text-sky-300 text-[11px] sm:text-xs">
             When due dates arrive, recurring entries automatically log matching transactions into your ledger.
           </p>
         </div>
@@ -84,7 +85,7 @@ export default function RecurringPage() {
 
       {/* Recurring Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           <CardSkeleton className="h-44" />
           <CardSkeleton className="h-44" />
           <CardSkeleton className="h-44" />
@@ -99,25 +100,25 @@ export default function RecurringPage() {
           className="py-16"
         />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
           {recurringItems.map(item => (
-            <div key={item.id} className="fin-card fin-card-hover p-6 flex flex-col justify-between space-y-4">
+            <div key={item.id} className="fin-card fin-card-hover p-4 sm:p-6 flex flex-col justify-between space-y-4">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2.5 rounded-xl ${
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className={`p-2.5 rounded-xl shrink-0 ${
                     item.type === 'income' 
                       ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400' 
                       : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
                   }`}>
                     {item.type === 'income' ? <TrendingUp className="w-5 h-5" /> : <TrendingDown className="w-5 h-5" />}
                   </div>
-                  <div>
-                    <h3 className="text-base font-extrabold text-slate-900 dark:text-white">{item.description}</h3>
-                    <p className="text-[11px] text-slate-400 font-medium">{item.category} • {item.frequency}</p>
+                  <div className="min-w-0">
+                    <h3 className="text-base font-extrabold text-slate-900 dark:text-white truncate">{item.description}</h3>
+                    <p className="text-[11px] text-slate-400 font-medium truncate">{item.category} • {item.frequency}</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1 shrink-0">
                   <button
                     onClick={() => { setEditingItem(item); setIsModalOpen(true); }}
                     className="p-1.5 text-slate-400 hover:text-sky-600 hover:bg-sky-50 dark:hover:bg-slate-800 rounded-xl transition-colors"
